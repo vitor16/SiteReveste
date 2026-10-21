@@ -1,0 +1,523 @@
+/* ReVeste - Design System & Custom Styles */
+/* Palette: Emerald Green & Tan / Sand / Camel */
+/* With Light / Dark Mode and Lo-Fi Equalizer Animations */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&display=swap');
+
+:root {
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Playfair Display', Georgia, serif;
+  
+  /* Primary & Emerald Palette */
+  --color-primary: #132E22; /* Deep forest charcoal */
+  --color-primary-dark: #0B1C15;
+  --color-emerald: #065F46; /* Rich emerald */
+  --color-emerald-vibrant: #059669; /* Vibrant emerald */
+  --color-emerald-hover: #047857;
+  --color-emerald-dark: #022C22;
+  --color-emerald-light: #ECFDF5;
+  --color-emerald-border: #A7F3D0;
+  
+  /* Tan & Sand & Camel Palette */
+  --color-tan: #B38B59; /* Classic refined tan */
+  --color-tan-dark: #8F6B3D; /* Deep camel/tan */
+  --color-tan-hover: #9E7745;
+  --color-tan-light: #F7F3EC; /* Light warm tan wash */
+  --color-tan-border: #E5DACD;
+  --color-sand: #EFE8DE;
+
+  /* Neutrals & Canvas - Light Mode */
+  --bg-main: #FBF9F5;
+  --bg-card: #FFFFFF;
+  --bg-card-subtle: #FAF7F2;
+  --border-color: #E8E2D8;
+  --text-main: #1A2821;
+  --text-muted: #5E6963;
+}
+
+/* Dark Mode Overrides */
+html.dark {
+  --color-primary: #E6EFEA;
+  --color-primary-dark: #FFFFFF;
+  --color-emerald-light: #06392B;
+  --color-emerald-border: #065F46;
+  
+  --color-tan: #CDB087;
+  --color-tan-light: #1F2822;
+  --color-tan-border: #35473C;
+
+  --bg-main: #09150F; /* Deep luxury emerald noir */
+  --bg-card: #102219;
+  --bg-card-subtle: #142A1F;
+  --border-color: #1F382B;
+  --text-main: #E7EFEA;
+  --text-muted: #8EA89C;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.font-serif {
+  font-family: var(--font-serif);
+}
+
+/* Custom Scrollbars in Tan/Emerald */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #F4EFE6;
+}
+html.dark ::-webkit-scrollbar-track {
+  background: #09150F;
+}
+::-webkit-scrollbar-thumb {
+  background: #D3C5B4;
+  border-radius: 4px;
+}
+html.dark ::-webkit-scrollbar-thumb {
+  background: #254234;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #B38B59;
+}
+
+/* Glassmorphism effects */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(232, 226, 216, 0.85);
+}
+html.dark .glass-panel {
+  background: rgba(16, 34, 25, 0.88);
+  border-color: rgba(31, 56, 43, 0.85);
+}
+
+.glass-nav {
+  background: rgba(251, 249, 245, 0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-color);
+}
+html.dark .glass-nav {
+  background: rgba(9, 21, 15, 0.94);
+  border-bottom-color: var(--border-color);
+}
+
+/* Product Card Transitions */
+.product-card {
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  background-color: var(--bg-card);
+  border-color: var(--border-color);
+}
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 36px -10px rgba(6, 95, 70, 0.18);
+}
+html.dark .product-card:hover {
+  box-shadow: 0 18px 36px -10px rgba(0, 0, 0, 0.5);
+}
+
+/* Custom Badges (Emerald & Tan) */
+.badge-emerald {
+  background-color: var(--color-emerald-light);
+  color: var(--color-emerald);
+  border: 1px solid var(--color-emerald-border);
+}
+.badge-tan {
+  background-color: var(--color-tan-light);
+  color: var(--color-tan-dark);
+  border: 1px solid var(--color-tan-border);
+}
+.badge-official {
+  background-color: #ECFDF5;
+  color: #065F46;
+  border: 1px solid #A7F3D0;
+}
+html.dark .badge-official {
+  background-color: #06392B;
+  color: #34D399;
+  border-color: #047857;
+}
+
+.badge-vintage {
+  background-color: #F8F4EC;
+  color: #8F6B3D;
+  border: 1px solid #E5DACD;
+}
+html.dark .badge-vintage {
+  background-color: #242A22;
+  color: #D5C1A6;
+  border-color: #4A3E34;
+}
+
+.badge-intl {
+  background-color: #F4EFEA;
+  color: #4A3E34;
+  border: 1px solid #DED4C7;
+}
+
+/* Navigation active tab indicator */
+.nav-tab {
+  position: relative;
+  transition: all 0.2s ease;
+}
+.nav-tab.active {
+  color: var(--color-emerald);
+  font-weight: 700;
+}
+html.dark .nav-tab.active {
+  color: #34D399;
+}
+.nav-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2.5px;
+  background-color: var(--color-emerald);
+  border-radius: 2px 2px 0 0;
+}
+html.dark .nav-tab.active::after {
+  background-color: #34D399;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.88; transform: scale(1.02); }
+}
+.pulse-glow {
+  animation: pulseGlow 2.5s infinite ease-in-out;
+}
+
+/* Equalizer Bars for Lo-Fi Player */
+@keyframes eqBounce {
+  0%, 100% { height: 4px; }
+  50% { height: 16px; }
+}
+.eq-bar {
+  width: 2.5px;
+  height: 4px;
+  background-color: #065F46;
+  border-radius: 2px;
+  transition: height 0.15s ease;
+}
+html.dark .eq-bar {
+  background-color: #34D399;
+}
+.eq-playing .eq-bar:nth-child(1) { animation: eqBounce 0.75s infinite ease-in-out; }
+.eq-playing .eq-bar:nth-child(2) { animation: eqBounce 0.45s infinite ease-in-out 0.2s; }
+.eq-playing .eq-bar:nth-child(3) { animation: eqBounce 0.85s infinite ease-in-out 0.4s; }
+.eq-playing .eq-bar:nth-child(4) { animation: eqBounce 0.6s infinite ease-in-out 0.1s; }
+
+/* Toast container */
+#toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 420px;
+  pointer-events: none;
+}
+.toast {
+  pointer-events: auto;
+  background: #11281E;
+  color: #FFFFFF;
+  padding: 14px 18px;
+  border-radius: 12px;
+  box-shadow: 0 12px 30px -5px rgba(2, 44, 34, 0.35);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.875rem;
+  border-left: 4px solid var(--color-tan);
+  animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.toast.toast-success {
+  border-left-color: #10B981;
+}
+.toast.toast-warning {
+  border-left-color: #F59E0B;
+}
+.toast.toast-error {
+  border-left-color: #EF4444;
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* Timeline component */
+.timeline-step {
+  position: relative;
+}
+.timeline-step::before {
+  content: '';
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  bottom: -20px;
+  width: 2px;
+  background: #E5DACD;
+}
+html.dark .timeline-step::before {
+  background: #243D30;
+}
+.timeline-step:last-child::before {
+  display: none;
+}
+.timeline-step.completed::before {
+  background: var(--color-emerald);
+}
+html.dark .timeline-step.completed::before {
+  background: #10B981;
+}
+
+/* Tables */
+.data-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.data-table th {
+  background-color: var(--bg-card-subtle);
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-color);
+  text-align: left;
+}
+.data-table td {
+  padding: 13px 14px;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.875rem;
+  color: var(--text-main);
+}
+.data-table tr:hover td {
+  background-color: var(--bg-card-subtle);
+}
+
+/* Dev Profile Cards */
+.dev-card {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-card);
+}
+.dev-card:hover {
+  transform: translateY(-6px);
+  border-color: #065F46;
+  box-shadow: 0 20px 40px -15px rgba(6, 95, 70, 0.2);
+}
+html.dark .dev-card:hover {
+  border-color: #34D399;
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
+}
+
+/* Print styles */
+@media print {
+  header, footer, .no-print {
+    display: none !important;
+  }
+  body {
+    background: white;
+    color: black;
+  }
+  .drs-section {
+    page-break-inside: avoid;
+  }
+}
+
+/* -----------------------------------------------------------
+   ReVeste editorial storefront refresh — cream, forest & camel
+   ----------------------------------------------------------- */
+:root {
+  --bg-main: #f7f2e9;
+  --bg-card: #fffdf8;
+  --bg-card-subtle: #f4ece1;
+  --border-color: #e5d9c9;
+  --text-main: #12372b;
+  --text-muted: #6b716b;
+}
+html:not(.dark) body { background: #f7f2e9 !important; color: #12372b; }
+html:not(.dark) .glass-nav { background: rgba(250,247,240,.97); border-bottom-color: #e9dfd2; }
+body > div:first-child { min-height: 62px; display:flex; align-items:center; }
+body > div:first-child > div { max-width: 1600px; width:100%; padding-top: 8px; padding-bottom: 8px; }
+header.glass-nav { box-shadow: 0 3px 18px rgba(43, 35, 21, .025); }
+header.glass-nav > div { max-width: 1720px; }
+header.glass-nav > div > div { min-height: 170px; gap: 22px; padding-top: 14px; padding-bottom: 14px; }
+.nav-tab { border-radius: 0 !important; background: transparent !important; border: 0 !important; padding: 12px 8px !important; font-size: 12px !important; }
+.nav-tab.active::after { height: 2px; bottom: 1px; }
+#main-content { width: 100%; }
+#main-content > .animate-fade-in { padding-bottom: 0; }
+.reveste-hero {
+  position: relative; display: grid; grid-template-columns: minmax(420px, .88fr) minmax(0, 1.32fr);
+  min-height: 500px; overflow: hidden; isolation: isolate; background: #f0e6d7;
+}
+.reveste-hero-copy {
+  position: relative; z-index: 2; display:flex; flex-direction:column; justify-content:center;
+  padding: clamp(42px, 5vw, 82px) clamp(28px, 5.1vw, 88px); max-width: 760px;
+  background: linear-gradient(90deg, #f5eee2 0%, #f5eee2 78%, rgba(245,238,226,.92) 100%);
+}
+.reveste-eyebrow { margin:0 0 20px; color:#b48150; font-size:12px; line-height:1.4; font-weight:800; letter-spacing:.23em; text-transform:uppercase; }
+.reveste-hero h1 { max-width: 670px; margin:0; color:#10392c; font-family:var(--font-serif); font-weight:700; font-size:clamp(2.7rem, 4.2vw, 4.8rem); letter-spacing:-.045em; line-height:1.03; }
+.reveste-hero-description { max-width:520px; margin:22px 0 27px; color:#25493d; font-size:16px; line-height:1.65; }
+.reveste-hero-actions { display:flex; flex-wrap:wrap; align-items:center; gap:12px; }
+.reveste-primary-cta { display:inline-flex; align-items:center; gap:22px; border:0; border-radius:999px; padding:17px 27px; color:white; background:#064b38; font-size:14px; font-weight:700; box-shadow:0 8px 22px rgba(6,75,56,.14); transition:transform .2s, background .2s; }
+.reveste-primary-cta:hover { transform:translateY(-2px); background:#086047; }
+.reveste-primary-cta span { font-size:20px; line-height:1; }
+.reveste-secondary-cta { border:1px solid rgba(6,75,56,.28); background:rgba(255,255,255,.45); color:#064b38; border-radius:999px; padding:15px 21px; font-size:13px; font-weight:700; }
+.reveste-secondary-cta:hover { background:#fffaf2; }
+.reveste-hero-art { position:relative; z-index:0; min-height:500px; background-image:linear-gradient(90deg, rgba(245,238,226,.28), transparent 28%), url('hero-clothes.jpg'); background-size:cover; background-position:center 48%; }
+.reveste-hero-art::after { content:""; position:absolute; inset:0; background:linear-gradient(90deg, rgba(245,238,226,.18), transparent 28%, rgba(15,31,20,.08)); }
+.reveste-hero-note { position:absolute; z-index:2; right:4.5%; top:18%; color:#f7e8ca; font-family:var(--font-serif); font-style:italic; font-size:clamp(1.4rem,2.3vw,2.5rem); line-height:1.25; text-align:center; transform:rotate(-7deg); text-shadow:0 2px 12px rgba(0,0,0,.22); pointer-events:none; }
+.reveste-benefits { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); background:#fbf8f1; border-bottom:1px solid #e9dfd2; padding:24px clamp(20px,4.6vw,76px); }
+.reveste-benefit { min-width:0; display:flex; align-items:center; gap:14px; padding:5px 22px; border-right:1px solid #ded2c2; }
+.reveste-benefit:first-child { padding-left:0; }
+.reveste-benefit:last-child { border-right:0; padding-right:0; }
+.reveste-benefit-icon { flex:0 0 38px; color:#0a4b38; font-size:34px; font-weight:400; line-height:1; text-align:center; }
+.reveste-benefit strong { display:block; color:#153a2e; font-size:11px; font-weight:800; line-height:1.45; }
+.reveste-benefit p { margin:7px 0 0; color:#74746d; font-size:10px; line-height:1.45; }
+.catalog-shell { max-width:1540px; margin:0 auto; padding:52px clamp(18px,4vw,64px) 76px; }
+.catalog-shell > div:first-child { border-radius:18px; }
+.catalog-shell .product-card { border-radius:5px !important; box-shadow:0 4px 18px rgba(47,35,17,.045); }
+.catalog-shell .product-card:hover { box-shadow:0 16px 32px rgba(6,95,70,.13); }
+.catalog-shell .grid { gap:22px !important; }
+footer { margin-top:0; }
+@media (min-width:1536px) {
+  header.glass-nav > div > div { flex-direction:row; }
+}
+@media (max-width:1279px) {
+  header.glass-nav > div > div { min-height:auto; }
+  .reveste-hero { grid-template-columns:minmax(340px,.9fr) minmax(0,1.1fr); }
+  .reveste-hero-copy { padding:42px 34px; }
+  .reveste-hero h1 { font-size:clamp(2.5rem,4vw,3.7rem); }
+  .reveste-benefit { padding:5px 12px; gap:9px; }
+  .reveste-benefit-icon { flex-basis:28px; font-size:28px; }
+}
+@media (max-width:900px) {
+  header.glass-nav > div > div { flex-direction:column; gap:14px; }
+  .reveste-brand { align-self:flex-start; }
+  .reveste-hero { grid-template-columns:1fr; }
+  .reveste-hero-copy { max-width:none; padding:46px 28px 40px; background:linear-gradient(180deg,#f5eee2 0%,#f5eee2 85%,rgba(245,238,226,.92) 100%); }
+  .reveste-hero h1 { max-width:680px; font-size:clamp(2.7rem,7vw,4.2rem); }
+  .reveste-hero-art { min-height:320px; grid-row:2; background-position:center 48%; }
+  .reveste-hero-note { top:auto; bottom:34px; right:7%; }
+  .reveste-benefits { grid-template-columns:repeat(2,minmax(0,1fr)); gap:0; padding:12px 22px; }
+  .reveste-benefit { padding:17px 10px; border-bottom:1px solid #e6dbcb; }
+  .reveste-benefit:nth-child(2n) { border-right:0; }
+  .reveste-benefit:last-child { grid-column:1/-1; border-bottom:0; }
+}
+@media (max-width:640px) {
+  body > div:first-child { min-height:unset; }
+  body > div:first-child > div { padding-left:12px; padding-right:12px; }
+  header.glass-nav > div { padding-left:14px; padding-right:14px; }
+  header.glass-nav > div > div { padding:14px 0; }
+  .reveste-brand { gap:10px; }
+  .reveste-wordmark span:first-child { font-size:2.3rem !important; }
+  .reveste-wordmark span:last-child { font-size:7px !important; letter-spacing:.08em !important; }
+  .reveste-hero-copy { padding:38px 22px 34px; }
+  .reveste-eyebrow { font-size:10px; letter-spacing:.17em; margin-bottom:15px; }
+  .reveste-hero h1 { font-size:2.65rem; }
+  .reveste-hero-description { font-size:14px; margin:17px 0 22px; }
+  .reveste-primary-cta { padding:15px 21px; }
+  .reveste-secondary-cta { padding:14px 17px; }
+  .reveste-hero-art { min-height:260px; }
+  .reveste-benefits { padding:7px 13px; }
+  .reveste-benefit { gap:8px; padding:13px 5px; }
+  .reveste-benefit-icon { flex-basis:24px; font-size:24px; }
+  .reveste-benefit strong { font-size:10px; }
+  .reveste-benefit p { font-size:9px; margin-top:4px; }
+  .catalog-shell { padding:34px 14px 50px; }
+}
+
+
+/* Precise, compact navigation inspired by the supplied reference */
+.reveste-header-shell { max-width:1720px; width:100%; }
+header.glass-nav > .reveste-header-shell { max-width:1720px; }
+.reveste-header-main { display:flex; align-items:center; justify-content:space-between; gap:clamp(18px,2vw,34px); min-height:170px; padding:12px 0; }
+.reveste-navrow { min-width:0; flex:1 1 auto; display:flex; align-items:center; justify-content:flex-end; gap:clamp(10px,1.4vw,24px); }
+.reveste-primary-nav { min-width:0; flex:1 1 auto; display:flex; align-items:center; justify-content:space-evenly; gap:clamp(3px,.6vw,10px); }
+.reveste-primary-nav .nav-tab { position:relative; flex:0 0 auto; display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:44px; color:#17372d; font-size:12px !important; font-weight:500; white-space:nowrap; padding:10px 8px !important; transition:color .18s ease; }
+.reveste-primary-nav .nav-tab svg, .header-icon-button svg, .reveste-account-button svg { width:19px; height:19px; fill:none; stroke:currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; flex:0 0 auto; }
+.reveste-primary-nav .nav-tab:hover { color:#087451 !important; }
+.reveste-primary-nav .nav-tab.active { color:#084d39 !important; }
+.reveste-primary-nav .nav-tab.active::after { left:0; right:0; bottom:0; height:2px; background:#087451; border-radius:2px; }
+.reveste-header-actions { flex:0 0 auto; display:flex; align-items:center; justify-content:flex-end; gap:clamp(7px,1vw,17px); color:#1c382e; }
+.header-icon-button { position:relative; width:34px; height:38px; padding:0; display:inline-flex; align-items:center; justify-content:center; border:0; border-radius:5px; background:transparent; color:inherit; cursor:pointer; transition:color .18s ease, background .18s ease; }
+.header-icon-button:hover { color:#087451; background:rgba(8,116,81,.06); }
+.header-icon-button svg { width:20px; height:20px; }
+.header-cart-button #cart-badge { position:absolute; top:-1px; right:-3px; min-width:17px; height:17px; padding:0 4px; border-radius:99px; display:flex; align-items:center; justify-content:center; background:#078b61; color:#fff; font-size:9px; font-weight:700; line-height:1; box-shadow:0 1px 2px rgba(0,0,0,.12); }
+.header-cart-button #cart-badge.hidden { display:none; }
+.reveste-account-switcher { display:flex; align-items:center; justify-content:center; }
+.reveste-account-button { position:relative; width:34px; height:38px; display:inline-flex; align-items:center; justify-content:center; color:inherit; cursor:pointer; }
+.reveste-account-button select { position:absolute; inset:0; width:100%; height:100%; opacity:0; cursor:pointer; }
+html:not(.dark) header.glass-nav { background:rgba(250,247,240,.97); border-color:#e9dfd2; }
+html.dark .reveste-primary-nav .nav-tab, html.dark .reveste-header-actions { color:#e7efe9; }
+html.dark .reveste-primary-nav .nav-tab.active { color:#6ee7b7 !important; }
+html.dark .reveste-primary-nav .nav-tab.active::after { background:#34d399; }
+
+@media (min-width:1280px) {
+  .reveste-header-main { flex-direction:row; }
+  .reveste-navrow { min-width:0; }
+  .reveste-wordmark > span:last-child { white-space:nowrap; }
+}
+@media (max-width:1279px) {
+  .reveste-header-main { min-height:0; flex-direction:column; align-items:stretch; gap:8px; padding:12px 0 10px; }
+  .reveste-brand { align-self:flex-start; }
+  .reveste-navrow { width:100%; justify-content:space-between; gap:12px; }
+  .reveste-primary-nav { justify-content:space-between; }
+  .reveste-primary-nav .nav-tab { gap:7px; padding:10px 7px !important; }
+  .reveste-primary-nav .nav-tab span { font-size:11px; }
+}
+@media (max-width:900px) {
+  .reveste-header-shell { padding-left:24px; padding-right:24px; }
+  .reveste-navrow { gap:12px; }
+  .reveste-primary-nav { overflow-x:auto; justify-content:flex-start; gap:12px; scrollbar-width:none; }
+  .reveste-primary-nav::-webkit-scrollbar { display:none; }
+  .reveste-primary-nav .nav-tab { padding:10px 8px !important; }
+  .reveste-header-actions { gap:5px; }
+}
+@media (max-width:640px) {
+  .reveste-header-shell { padding-left:14px; padding-right:14px; }
+  .reveste-header-main { gap:9px; padding:10px 0 8px; }
+  .reveste-wordmark > span:last-child { max-width:190px; line-height:1.3; }
+  .reveste-navrow { align-items:stretch; flex-direction:column; gap:3px; }
+  .reveste-primary-nav { width:100%; gap:8px; }
+  .reveste-primary-nav .nav-tab { min-height:38px; gap:6px; padding:8px 7px !important; }
+  .reveste-primary-nav .nav-tab svg { width:17px; height:17px; }
+  .reveste-primary-nav .nav-tab span { font-size:11px; }
+  .reveste-header-actions { justify-content:flex-end; padding-right:2px; }
+}

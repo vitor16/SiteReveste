@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ReVeste — Moda, Revenda & Marketplace Circular</title>
+  <meta name="description" content="Plataforma de venda, revenda e marketplace de moda circular baseada no Documento de Requisitos de Software (DRS ReVeste 2026)." />
+
+  <!-- Instant Theme Initializer (prevents flicker) -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('REVESTE_THEME');
+      if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+  </script>
+
+  <!-- Google Fonts: Plus Jakarta Sans & Playfair Display -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS via CDN with Emerald, Tan & Dark Mode configuration -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            serif: ['"Playfair Display"', 'Georgia', 'serif'],
+          },
+          colors: {
+            emerald: {
+              50: '#ECFDF5',
+              100: '#D1FAE5',
+              200: '#A7F3D0',
+              300: '#6EE7B7',
+              400: '#34D399',
+              500: '#10B981',
+              600: '#059669',
+              700: '#047857',
+              800: '#065F46',
+              900: '#064E3B',
+              950: '#022C22',
+            },
+            tan: {
+              50: '#FAF7F2',
+              100: '#F4ECE1',
+              200: '#E8DBC9',
+              300: '#D5C1A6',
+              400: '#C1A480',
+              500: '#B38B59',
+              600: '#9B7443',
+              700: '#7F5E33',
+              800: '#644927',
+              900: '#4A351B',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .reveste-brand { min-width: 0; padding: 0; border: 0; background: transparent; text-align: left; cursor: pointer; }
+    .reveste-logo-frame { display:block; width:clamp(86px, 11vw, 184px); height:clamp(86px, 11vw, 184px); padding:4px; flex:0 0 auto; border-radius:50%; background:linear-gradient(145deg,#0b5a40,#087a54 60%,#b38b59); box-shadow:0 7px 20px rgba(6,95,70,.16); }
+    .reveste-logo-image { display:block; width:100%; height:100%; object-fit:cover; object-position:center 35%; border:3px solid #fbf9f5; border-radius:50%; }
+    .reveste-wordmark { display:block; white-space:nowrap; }
+    .reveste-wordmark > span:first-child { font-size:clamp(3.3rem,5.2vw,6rem); letter-spacing:-.065em; }
+    .reveste-wordmark > span:last-child { color:#ad7d4f; font-size:12px; letter-spacing:.16em; }
+    @media (max-width: 1535px) { .reveste-brand { gap:14px; } .reveste-wordmark > span:first-child { font-size:clamp(2.7rem,4.5vw,5rem); } }
+    @media (max-width: 1279px) { .reveste-brand { gap:14px; } .reveste-logo-frame { width:clamp(76px,10vw,112px); height:clamp(76px,10vw,112px); } .reveste-wordmark > span:first-child { font-size:clamp(2.5rem,5.5vw,4rem); } }
+    @media (max-width: 640px) { .reveste-brand { gap:10px; } .reveste-logo-frame { width:66px; height:66px; } .reveste-wordmark > span:first-child { font-size:2.2rem; } .reveste-wordmark > span:last-child { font-size:7px; letter-spacing:.08em; white-space:normal; max-width:210px; } }
+  </style>
+</head>
+<body class="bg-[#FBF9F5] dark:bg-[#09150F] text-[#1A2821] dark:text-[#E7EFEA] flex flex-col min-h-screen transition-colors duration-300">
+
+  <!-- Top Announcement Bar (Deep Forest Emerald & Warm Tan) -->
+  <div class="bg-[#0B1C15] text-[#E0D7CB] text-[11px] py-2 px-4 border-b border-emerald-950/60">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-1 text-center sm:text-left">
+      <div class="flex items-center gap-2">
+        <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span>ReVeste — Moda Circular & Marketplace Integrado • <strong>DRS v1.0 (Outubro/2026)</strong></span>
+      </div>
+      <div class="flex items-center gap-4 text-tan-300">
+        <span class="hidden md:inline">Engenharia de Software & Moda</span>
+        <button onclick="app.setTab('quem-somos')" class="text-tan-400 hover:text-tan-200 font-semibold underline text-[11px]">
+          Conheça os Devs_ →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Navigation Header -->
+  <header class="glass-nav sticky top-0 z-40 bg-[#FBF9F5]/95 dark:bg-[#09150F]/95 backdrop-blur-md border-b border-[#E8E2D8] dark:border-[#1F382B] transition-colors duration-300">
+    <div class="reveste-header-shell mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="reveste-header-main">
+        <button class="reveste-brand flex items-center gap-5 shrink-0" onclick="app.setTab('loja')" aria-label="ReVeste — página inicial">
+          <span class="reveste-logo-frame">
+            <img src="logo.jpg" alt="Retrato do fundador, logo da ReVeste" class="reveste-logo-image" />
+          </span>
+          <span class="reveste-wordmark">
+            <span class="text-5xl md:text-6xl font-serif font-black tracking-tight text-[#132E22] dark:text-[#E7EFEA] block leading-[0.95]">Re<span class="text-[#065F46] dark:text-[#34D399]">Veste</span></span>
+            <span class="text-xs md:text-sm text-[#8F6B3D] dark:text-[#CDB087] uppercase tracking-[0.18em] font-extrabold block mt-2">Moda &amp; Marketplace Circular</span>
+          </span>
+        </button>
+
+        <div class="reveste-navrow">
+          <nav class="reveste-primary-nav" aria-label="Navegação principal">
+            <button onclick="app.setTab('loja')" data-tab="loja" class="nav-tab" aria-label="Loja">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14l1 12H4L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span>Loja</span>
+            </button>
+            <button onclick="app.setTab('revender')" data-tab="revender" class="nav-tab" aria-label="Quero Revender">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 7 3-3 2 3"/><path d="M10 4 7.5 8.5A4.5 4.5 0 0 0 11 15h1"/><path d="m17 17-3 3-2-3"/><path d="M14 20l2.5-4.5A4.5 4.5 0 0 0 13 9h-1"/><path d="m4 14 1 4 4-1"/><path d="m20 10-1-4-4 1"/></svg><span>Quero Revender</span>
+            </button>
+            <button onclick="app.setTab('rastreio')" data-tab="rastreio" class="nav-tab" aria-label="Rastreamento">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h11v11H3z"/><path d="M14 11h4l3 3v4h-7z"/><circle cx="7.5" cy="19" r="1.7"/><circle cx="17.5" cy="19" r="1.7"/></svg><span>Rastreamento</span>
+            </button>
+            <button onclick="app.setTab('drs')" data-tab="drs" class="nav-tab" aria-label="Central DRS">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/></svg><span>Central DRS</span>
+            </button>
+            <button onclick="app.setTab('quem-somos')" data-tab="quem-somos" class="nav-tab" aria-label="Quem Somos">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20v-1.4A5.6 5.6 0 0 1 8.1 13h1.8a5.6 5.6 0 0 1 5.6 5.6V20M16 4.8a3.5 3.5 0 0 1 0 6.5M18 13.5a5.3 5.3 0 0 1 3.5 5V20"/></svg><span>Quem Somos</span>
+            </button>
+          </nav>
+
+          <div class="reveste-header-actions" aria-label="Ações da conta">
+            <button class="header-icon-button" type="button" title="Buscar produtos" aria-label="Buscar produtos" onclick="app.setTab('loja'); setTimeout(() => document.getElementById('catalog-search-input')?.focus(), 80)">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></svg>
+            </button>
+            <button id="theme-toggle-btn" class="header-icon-button" type="button" onclick="app.toggleTheme()" title="Alternar modo escuro/claro" aria-label="Alternar modo escuro/claro">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.1A8.6 8.6 0 0 1 9.9 3.5 8.8 8.8 0 1 0 20.5 14.1Z"/></svg>
+            </button>
+            <div id="user-switcher-container" class="reveste-account-switcher"></div>
+            <button class="header-icon-button header-cart-button" type="button" onclick="app.openCartDrawer()" title="Ver sacola" aria-label="Ver sacola">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2l2.2 11.2a2 2 0 0 0 2 1.6h8.9a2 2 0 0 0 1.9-1.4L22 8H6"/><circle cx="10" cy="20" r="1.2"/><circle cx="18" cy="20" r="1.2"/></svg>
+              <span id="cart-badge" class="hidden">0</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Dynamic Viewport -->
+  <main class="flex-1 w-full">
+    <div id="main-content">
+      <!-- Dynamic content rendered by app.js -->
+    </div>
+  </main>
+
+  <!-- Cart Slide-Over Drawer -->
+  <div id="cart-drawer" class="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-white dark:bg-[#102219] shadow-2xl border-l border-[#E8E2D8] dark:border-[#1F382B] transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
+    <div class="p-5 border-b border-[#E8E2D8] dark:border-[#1F382B] flex items-center justify-between bg-[#FAF7F2] dark:bg-[#142A1F]">
+      <div class="flex items-center gap-2">
+        <span class="text-xl">🛍️</span>
+        <h3 class="font-bold text-[#132E22] dark:text-[#E7EFEA] text-sm uppercase tracking-wider">Sua Sacola de Compras</h3>
+      </div>
+      <button onclick="app.closeCartDrawer()" class="w-8 h-8 rounded-full bg-stone-200 dark:bg-stone-800 hover:bg-stone-300 text-stone-700 dark:text-stone-300 flex items-center justify-center text-sm font-bold">
+        ✕
+      </button>
+    </div>
+
+    <div id="cart-items-container" class="flex-1 overflow-y-auto p-5 space-y-3"></div>
+    <div id="cart-summary-container" class="p-5 border-t border-[#E8E2D8] dark:border-[#1F382B] bg-white dark:bg-[#102219]"></div>
+  </div>
+
+  <!-- Generic Modal Container -->
+  <div id="modal-container" class="hidden"></div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container"></div>
+
+  <!-- Platform Footer -->
+  <footer class="bg-[#0B1C15] text-[#D0C7B8] text-xs border-t border-emerald-950 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 pb-8 border-b border-emerald-900/40">
+        
+        <div class="md:col-span-2 space-y-3">
+          <div class="flex items-center gap-2 text-white font-serif text-2xl font-bold">
+            <span>Re<span class="text-[#34D399]">Veste</span></span>
+          </div>
+          <p class="text-[#A3B8AD] text-xs leading-relaxed max-w-md">
+            Plataforma inovadora de moda sustentável, integrando venda de coleções novas autorais, brechó curado e revenda entre clientes com rastreamento logístico e divisão transparente de comissões.
+          </p>
+          <div class="pt-2 text-[11px] text-tan-300">
+            <strong class="text-white">Equipe Autora do DRS (Devs_):</strong><br/>
+            Vitor Avelar • Gabriel Andrade • Rafael Santana • Bruno dos Santos • João Gabriel • Gustavo Giovani Silva.
+          </div>
+        </div>
+
+        <div>
+          <h4 class="text-white font-bold uppercase tracking-wider text-[11px] mb-3">Requisitos & Módulos</h4>
+          <ul class="space-y-1.5 text-[11px]">
+            <li><a href="javascript:void(0)" onclick="app.setTab('loja')" class="hover:text-emerald-300 transition">🛍️ Loja & Estoque (RF-01 / RF-02)</a></li>
+            <li><a href="javascript:void(0)" onclick="app.setTab('revender')" class="hover:text-emerald-300 transition">♻️ Quero Revender (RF-08 / RN-03)</a></li>
+            <li><a href="javascript:void(0)" onclick="app.setTab('rastreio')" class="hover:text-emerald-300 transition">📦 Rastreamento (RF-06 / RF-09)</a></li>
+            <li><a href="javascript:void(0)" onclick="app.setTab('parceiro')" class="hover:text-emerald-300 transition">🤝 Painel Parceiro 80/20 (RF-07)</a></li>
+            <li><a href="javascript:void(0)" onclick="app.setTab('admin')" class="hover:text-emerald-300 transition">⚙️ Planilha de Estoque (RF-03)</a></li>
+            <li><a href="javascript:void(0)" onclick="app.setTab('quem-somos')" class="hover:text-emerald-300 transition font-bold text-emerald-400">👥 Conheça os Devs_</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-white font-bold uppercase tracking-wider text-[11px] mb-3">Experiência & Áudio</h4>
+          <div class="space-y-2">
+            <button onclick="app.toggleLofiMusic()" class="w-full py-2 px-3 bg-emerald-900/80 hover:bg-emerald-800 text-emerald-200 rounded-xl text-[11px] font-semibold border border-emerald-600/50 flex items-center justify-center gap-1.5 transition">
+              🎵 Tocar Música Lo-Fi de Loja
+            </button>
+            <button onclick="app.setTab('drs'); setTimeout(() => app.runAllAcceptanceTests(), 300);" class="w-full py-2 px-3 bg-[#183629] hover:bg-[#204938] text-tan-200 rounded-xl text-[11px] font-semibold border border-emerald-900/50 flex items-center justify-center gap-1.5 transition">
+              🧪 Rodar Casos de Teste (CT-01 a 08)
+            </button>
+            <button onclick="app.resetData()" class="w-full py-2 px-3 bg-stone-900 hover:bg-stone-800 text-stone-400 rounded-xl text-[11px] font-medium flex items-center justify-center gap-1.5 transition">
+              🔄 Restaurar Dados Padrão do DRS
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-center justify-between text-[11px] text-[#7A9184] gap-2">
+        <p>© 2026 ReVeste — Todos os direitos reservados. DRS Versão 1.0 (Outubro/2026).</p>
+        <p>Desenvolvido para conformidade integral com a especificação de software.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Main JavaScript App -->
+  <script src="app.js"></script>
+</body>
+</html>

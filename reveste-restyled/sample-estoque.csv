@@ -1,0 +1,11 @@
+id,nome,categoria,tamanho,cor,preco,quantidade,tipo,vendedor
+1,Jaqueta Jeans Oversized Vintage,Casacos,G,Azul Vintage,189.90,12,revenda,Studio Vintage SP
+2,Vestido Linho Midi Sustentável,Vestidos,M,Areia,249.00,8,novo,ReVeste Oficial
+3,Camisa Algodão Egípcio Classic,Camisas,M,Branco,159.50,15,novo,ReVeste Oficial
+4,Calça Alfaiataria Pregas Retrô,Calças,40,Cinza Chumbo,199.90,9,revenda,Ateliê Retrô Urbano
+5,Trench Coat Bege Elegance,Casacos,M,Bege Camel,389.00,5,revenda,Camila Rocha (Cliente)
+6,Bolsa de Couro Upcycling Artesanal,Acessórios,Único,Caramelo,220.00,7,revenda,EcoModa Brasil
+7,Blazer Slim Fit Linho Rústico,Casacos,G,Terracota,329.90,6,novo,ReVeste Oficial
+8,Saia Plissada Midi Floral 90s,Saias,P,Estampa Floral,129.90,14,revenda,Studio Vintage SP
+9,Tênis Casual Sustentável Knit,Calçados,41,Preto e Branco,279.90,10,novo,ReVeste Oficial
+10,Cardigan Tricot Chunky Artesanal,Casacos,Único,Off-white,179.00,11,revenda,Mariana Lima (Cliente)
