@@ -1,14 +1,14 @@
 # ReVeste — Plataforma de Venda, Revenda e Marketplace de Moda
 
 > **Documento de Referência:** Documento de Requisitos de Software (DRS) — Versão 1.0 (Outubro de 2026)  
-> **Equipe de Desenvolvimento / Autores:**  
+> **Desenvolvimento do site: Develup**  
 > Vitor Avelar • Gabriel Andrade • Rafael Santana • Bruno dos Santos • João Gabriel • Gustavo Giovani Silva
 
 ---
 
 ## 🌟 Visão Geral do Projeto
 
-A **ReVeste** é uma plataforma e marketplace de moda circular e consciente criada para integrar a venda de peças novas autorais, a revenda curada de brechós parceiros e o desapego direto por clientes cadastrados (C2C).
+A **ReVeste** é um projeto de plataforma e marketplace de moda circular e consciente criada para integrar a venda de peças novas autorais, a revenda curada de brechós parceiros e o desapego direto por clientes cadastrados (C2C).
 
 O sistema resolve os principais desafios operacionais descritos no DRS:
 1. **Controle e Sincronização Automática de Estoque** (via arquivos de planilha/CSV e baixa automática no fechamento de compras).
@@ -117,3 +117,14 @@ reveste-platform/
 ---
 
 *ReVeste — Moda que se reinventa, veste e ReVeste.*
+
+
+## Desenvolvimento
+O site da ReVeste foi desenvolvido pela **Develup**. A Develup é a equipe responsável pela criação da experiência web e não faz parte da equipe interna da ReVeste.
+
+
+## Atualização de interface — outubro de 2026
+
+- Adicionado o formulário **Criar conta** para cadastrar perfis de cliente de demonstração. Os perfis são salvos no `localStorage` deste navegador; este formulário não é autenticação de produção e não armazena a senha.
+- Substituído o retrato usado como logotipo por um símbolo SVG próprio da ReVeste, inspirado em cabide e moda circular.
+- O retrato original foi reaproveitado na seção **Quem Somos — Develup** como imagem editorial.

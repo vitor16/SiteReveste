@@ -21,7 +21,16 @@ const FASHION_PRESETS = [
   { nome: 'Suéter Tricot Chunky Tan Areia', categoria: 'Casacos', url: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=700&q=80' },
   { nome: 'Tênis Casual Knit Sustentável', categoria: 'Calçados', url: 'https://images.unsplash.com/photo-1525966222134-fcfa99b8ae77?auto=format&fit=crop&w=700&q=80' },
   { nome: 'Blazer Alfaiataria Tan Terracota', categoria: 'Casacos', url: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?auto=format&fit=crop&w=700&q=80' },
-  { nome: 'Camisa Linho Rústica Areia', categoria: 'Camisas', url: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=700&q=80' }
+  { nome: 'Camisa Linho Rústica Areia', categoria: 'Camisas', url: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&w=700&q=80' },
+  { nome: 'Moletom Minimalista Verde', categoria: 'Moletons', url: 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?auto=format&fit=crop&w=700&q=80' },
+  { nome: 'Camiseta Básica Premium', categoria: 'Camisetas', url: 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=700&q=80' },
+  { nome: 'Shorts de Linho Natural', categoria: 'Shorts', url: 'https://images.unsplash.com/photo-1591195853828-11db59a44f6b?auto=format&fit=crop&w=700&q=80' },
+  { nome: 'Macacão Preto Atemporal', categoria: 'Macacões', url: 'https://images.unsplash.com/photo-1548624149-fc7c8c5f4a18?auto=format&fit=crop&w=700&q=80' },
+  { nome: 'Bolsa Tiracolo Vintage', categoria: 'Acessórios', url: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=700&q=80' },
+  { nome: 'Saia Jeans Midi', categoria: 'Saias', url: 'https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?auto=format&fit=crop&w=700&q=80' },
+  { nome: 'Calça Jeans Reta', categoria: 'Calças', url: 'https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&w=700&q=80' },
+  { nome: 'Cardigan Tricot Clássico', categoria: 'Tricôs', url: 'https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=700&q=80' },
+  { nome: 'Tênis Urbano Casual', categoria: 'Calçados', url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=700&q=80' }
 ];
 
 // Developers Team from DRS
@@ -493,11 +502,13 @@ class LofiAudioEngine {
 class ReVesteApp {
   constructor() {
     this.data = this.loadData();
+    this.ensureCatalogVariety();
     this.currentTab = 'loja';
     this.activeCategory = 'Todos';
     this.searchQuery = '';
     this.activeFilterType = 'todos';
     this.editingProduct = null;
+    this.pendingResaleImage = null;
     this.lofi = new LofiAudioEngine();
     
     this.init();
@@ -513,6 +524,18 @@ class ReVesteApp {
       console.warn('Erro ao carregar dados do localStorage, usando defaults', e);
     }
     return JSON.parse(JSON.stringify(DEFAULT_DATA));
+  }
+
+  ensureCatalogVariety() {
+    if (!this.data || !Array.isArray(this.data.produtos)) return;
+    const extras = FASHION_PRESETS.filter(p => !this.data.produtos.some(x => x.nome === p.nome)).map((p, i) => ({
+      id: Math.max(0, ...this.data.produtos.map(x => Number(x.id) || 0)) + i + 1, nome: p.nome,
+      descricao: 'Peça selecionada para ampliar a variedade do catálogo de moda circular.', categoria: p.categoria,
+      tamanho: ['P','M','G','42','Único'][i % 5], cor: ['Verde oliva','Areia','Preto','Azul vintage','Caramelo'][i % 5],
+      preco: [89.9,129.9,159.9,199.9,239.9][i % 5], quantidade: 3 + (i % 9), tipo: 'revenda',
+      vendedor: 'Curadoria ReVeste', tipoVendedor: 'parceiro', condicao: 'Seminovo em ótimo estado', imagem: p.url, ativo: true
+    }));
+    this.data.produtos.push(...extras);
   }
 
   saveData() {
@@ -551,7 +574,7 @@ class ReVesteApp {
     const isDark = document.documentElement.classList.toggle('dark');
     localStorage.setItem('REVESTE_THEME', isDark ? 'dark' : 'light');
     this.updateThemeButton(isDark);
-    this.showToast(isDark ? '🌙 Modo Escuro ativado (Esmeralda Noturno)' : '☀️ Modo Claro ativado (Areia & Tan)', 'info');
+    this.showToast(isDark ? ' Modo Escuro ativado (Esmeralda Noturno)' : '️ Modo Claro ativado (Areia & Tan)', 'info');
   }
 
   updateThemeButton(isDark) {
@@ -576,7 +599,7 @@ class ReVesteApp {
     }
 
     if (playing) {
-      this.showToast('🎵 Música Lo-Fi de Boutique iniciada. Relaxe e navegue pela loja!', 'success');
+      this.showToast(' Música Lo-Fi de Boutique iniciada. Relaxe e navegue pela loja!', 'success');
     } else {
       this.showToast('⏸ Música Lo-Fi pausada.', 'info');
     }
@@ -585,15 +608,15 @@ class ReVesteApp {
   // --- GUARANTEED FALLBACK FASHION PLACEHOLDER (Vector SVG, 100% Offline) ---
   getFashionPlaceholder(categoria = 'Casacos', nome = 'Peça ReVeste', cor = 'Tan & Esmeralda', tipo = 'curada') {
     const iconMap = {
-      'Casacos': '🧥',
-      'Vestidos': '👗',
-      'Camisas': '👔',
-      'Calças': '👖',
-      'Saias': '💃',
-      'Acessórios': '👜',
-      'Calçados': '👟'
+      'Casacos': '',
+      'Vestidos': '',
+      'Camisas': '',
+      'Calças': '',
+      'Saias': '',
+      'Acessórios': '',
+      'Calçados': ''
     };
-    const icon = iconMap[categoria] || '✨';
+    const icon = iconMap[categoria] || '';
     const cleanNome = (nome || 'Peça Exclusiva').replace(/"/g, '&quot;');
     const cleanCat = (categoria || 'Vestuário').toUpperCase();
     const cleanCor = (cor || 'Acabamento Nobre').replace(/"/g, '&quot;');
@@ -622,7 +645,7 @@ class ReVesteApp {
       <text x="300" y="516" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-size="12" font-weight="bold" fill="#FFFFFF" letter-spacing="2">${cleanCat}</text>
       <text x="300" y="575" text-anchor="middle" font-family="'Playfair Display', Georgia, serif" font-size="22" font-weight="600" fill="#132E22">${cleanNome.length > 28 ? cleanNome.substring(0, 26) + '...' : cleanNome}</text>
       <text x="300" y="605" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-size="13" font-weight="500" fill="#8F6B3D">Tom / Acabamento: ${cleanCor}</text>
-      <text x="300" y="675" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" font-weight="600" fill="#065F46" letter-spacing="1">✓ PEÇA HIGIENIZADA &amp; REVISADA</text>
+      <text x="300" y="675" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-size="10" font-weight="600" fill="#065F46" letter-spacing="1"> PEÇA HIGIENIZADA &amp; REVISADA</text>
     </svg>`;
 
     return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
@@ -645,6 +668,63 @@ class ReVesteApp {
       this.render();
       this.showToast(`Perfil alterado para: ${user.nome} (${user.perfil.toUpperCase()})`, 'info');
     }
+  }
+
+  openCreateAccountModal() {
+    const modal = document.getElementById('modal-container');
+    if (!modal) return;
+    modal.classList.remove('hidden');
+    modal.innerHTML = `
+      <div class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in" onclick="if(event.target === this) app.closeModal()">
+        <section class="w-full max-w-lg max-h-[92vh] overflow-y-auto rounded-3xl bg-white dark:bg-[#102219] border border-[#E8E2D8] dark:border-[#1F382B] shadow-2xl">
+          <header class="flex items-start justify-between gap-4 p-6 md:p-8 border-b border-[#E8E2D8] dark:border-[#1F382B] bg-[#FAF7F2] dark:bg-[#142A1F]">
+            <div><p class="text-xs uppercase tracking-[.18em] font-bold text-[#8F6B3D] mb-2">Bem-vindo à ReVeste</p><h2 class="font-serif text-3xl font-bold text-[#132E22] dark:text-[#E7EFEA]">Criar conta</h2><p class="text-sm text-[#5E6963] dark:text-[#8EA89C] mt-2">Cadastre seus dados para personalizar sua experiência.</p></div>
+            <button type="button" onclick="app.closeModal()" class="w-9 h-9 rounded-full border border-[#E5D9C9] dark:border-[#35473C] text-[#132E22] dark:text-white" aria-label="Fechar">×</button>
+          </header>
+          <form class="p-6 md:p-8 space-y-4" onsubmit="app.createAccount(event)">
+            <label class="block text-sm font-semibold text-[#132E22] dark:text-[#E7EFEA]">Nome completo<input id="new-account-name" required minlength="2" autocomplete="name" class="mt-2 w-full rounded-xl border border-[#E5D9C9] dark:border-[#35473C] bg-[#FBF9F5] dark:bg-[#142A1F] px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-700" placeholder="Seu nome" /></label>
+            <label class="block text-sm font-semibold text-[#132E22] dark:text-[#E7EFEA]">E-mail<input id="new-account-email" type="email" required autocomplete="email" class="mt-2 w-full rounded-xl border border-[#E5D9C9] dark:border-[#35473C] bg-[#FBF9F5] dark:bg-[#142A1F] px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-700" placeholder="voce@exemplo.com" /></label>
+            <label class="block text-sm font-semibold text-[#132E22] dark:text-[#E7EFEA]">Senha<input id="new-account-password" type="password" required minlength="8" autocomplete="new-password" class="mt-2 w-full rounded-xl border border-[#E5D9C9] dark:border-[#35473C] bg-[#FBF9F5] dark:bg-[#142A1F] px-4 py-3 outline-none focus:ring-2 focus:ring-emerald-700" placeholder="Mínimo de 8 caracteres" /><span class="block text-xs font-normal text-[#6B716B] mt-1">Demonstração local: a conta fica salva neste navegador. Não use uma senha real.</span></label>
+            <button type="submit" class="w-full rounded-full bg-[#064B38] hover:bg-[#047857] text-white font-bold py-3.5 transition">Criar minha conta</button>
+            <div class="flex items-center gap-3 text-xs text-stone-400"><span class="h-px flex-1 bg-stone-200"></span>ou continue com<span class="h-px flex-1 bg-stone-200"></span></div>
+            <button type="button" onclick="app.signInWithGoogleDemo()" class="w-full flex items-center justify-center gap-3 rounded-full border border-stone-300 dark:border-stone-600 py-3 font-semibold text-[#132E22] dark:text-white hover:bg-stone-50 dark:hover:bg-[#183426] transition"><span class="font-bold text-base">G</span> Entrar com Google</button>
+            <p class="text-center text-[11px] text-[#6B716B]">A opção Google está em modo demonstrativo; o login real exige configurar OAuth do Google.</p>
+            <p class="text-center text-xs text-[#6B716B]">Ao continuar, você cria um perfil de demonstração no site.</p>
+          </form>
+        </section>
+      </div>`;
+  }
+
+  signInWithGoogleDemo() {
+    const email = prompt('Demonstração de login Google: informe o e-mail de teste. Para autenticação real, configure as credenciais OAuth.');
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) { this.showToast('Informe um e-mail válido para a demonstração.', 'error'); return; }
+    const cleanEmail = email.trim().toLowerCase();
+    let user = this.data.perfisDisponiveis.find(u => String(u.email).toLowerCase() === cleanEmail);
+    if (!user) { user = { id: Math.max(0, ...this.data.perfisDisponiveis.map(u => Number(u.id)||0))+1, nome: cleanEmail.split('@')[0].replace(/[._-]/g,' ').replace(/\b\w/g,c=>c.toUpperCase()), email: cleanEmail, perfil: 'cliente', descricao: 'Conta de demonstração criada pelo botão Google' }; this.data.perfisDisponiveis.push(user); }
+    this.data.currentUser = { ...user }; this.saveData(); this.closeModal(); this.renderHeader(); this.render(); this.showToast('Sessão de demonstração iniciada. Login Google real ainda precisa de OAuth.', 'info');
+  }
+
+  createAccount(event) {
+    event.preventDefault();
+    const nome = document.getElementById('new-account-name')?.value.trim();
+    const email = document.getElementById('new-account-email')?.value.trim().toLowerCase();
+    const password = document.getElementById('new-account-password')?.value;
+    if (!nome || !email || !password || password.length < 8) {
+      this.showToast('Preencha os campos corretamente. A senha deve ter pelo menos 8 caracteres.', 'error');
+      return;
+    }
+    if (this.data.perfisDisponiveis.some(u => String(u.email).toLowerCase() === email)) {
+      this.showToast('Já existe uma conta cadastrada com este e-mail.', 'warning');
+      return;
+    }
+    const user = { id: Math.max(0, ...this.data.perfisDisponiveis.map(u => Number(u.id) || 0)) + 1, nome, email, perfil: 'cliente', descricao: 'Cliente cadastrada pelo formulário de criação de conta', autenticacao2FA: false };
+    this.data.perfisDisponiveis.push(user);
+    this.data.currentUser = { ...user };
+    this.saveData();
+    this.closeModal();
+    this.renderHeader();
+    this.render();
+    this.showToast(`Conta de demonstração criada para ${nome}.`, 'success');
   }
 
   hasAdminAccess() {
@@ -688,7 +768,21 @@ class ReVesteApp {
           </select>
         </label>
       `;
+      userSelect.insertAdjacentHTML('beforeend', `
+        <button type="button" class="develup-create-account" onclick="app.openCreateAccountModal()" aria-label="Criar conta">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          <span>Criar conta</span>
+        </button>
+      `);
     }
+
+    // The spreadsheet entry point is only shown to administrator profiles.
+    document.querySelectorAll('a').forEach(link => {
+      if ((link.textContent || '').toLowerCase().includes('planilha de estoque')) {
+        const wrapper = link.closest('li') || link;
+        wrapper.classList.toggle('hidden', user.perfil !== 'admin');
+      }
+    });
 
     document.querySelectorAll('.nav-tab').forEach(el => {
       const tab = el.getAttribute('data-tab');
@@ -748,25 +842,32 @@ class ReVesteApp {
       <div class="animate-fade-in max-w-6xl mx-auto pb-20 space-y-12">
         <!-- Hero Header -->
         <div class="bg-gradient-to-br from-[#063223] via-[#065F46] to-[#453118] rounded-3xl p-8 md:p-14 text-white shadow-xl relative overflow-hidden border border-emerald-700/40">
-          <div class="relative z-10 max-w-2xl">
+          <div class="relative z-10 grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_220px] gap-8 items-center">
+          <div class="max-w-2xl">
             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#F4ECE1]/20 text-tan-200 border border-[#F4ECE1]/30 mb-4 backdrop-blur-md">
-              👥 Equipe de Engenharia &amp; Autoria do DRS
+              Develup Studio · Desenvolvimento Web
             </span>
             <h1 class="text-3xl md:text-5xl font-serif font-bold tracking-tight mb-4 leading-tight text-[#FAF7F2]">
-              Quem Somos — Devs_
+              Quem Somos — Develup
             </h1>
             <p class="text-[#D8E6DF] text-sm md:text-base leading-relaxed mb-6 font-light">
-              Conheça os estudantes e engenheiros responsáveis pelo desenvolvimento da plataforma <strong>ReVeste</strong> 
-              e pela elaboração do <strong>Documento de Requisitos de Software (DRS Versão 1.0, Outubro/2026)</strong>.
+              Somos a <strong>Develup</strong>, uma equipe de desenvolvimento que transforma ideias em experiências digitais. Criamos este site para a <strong>ReVeste</strong> como projeto de desenvolvimento web — não fazemos parte da equipe interna da ReVeste.
             </p>
             <div class="flex flex-wrap items-center gap-3">
               <button onclick="app.setTab('drs')" class="px-5 py-2.5 rounded-full bg-[#B38B59] hover:bg-[#9E7745] text-white font-semibold text-xs uppercase tracking-wider transition shadow-md flex items-center gap-2">
-                📋 Acessar Especificação Técnica (DRS)
+                Acessar Especificação Técnica (DRS)
               </button>
               <button onclick="app.toggleLofiMusic()" class="px-5 py-2.5 rounded-full bg-white/10 hover:bg-white/20 text-white font-medium text-xs transition backdrop-blur-md border border-white/20 flex items-center gap-2">
-                🎵 Ouvir Lo-Fi dos Devs
+                Ouvir Lo-Fi
               </button>
             </div>
+          </div>
+          <figure class="justify-self-center md:justify-self-end w-40 md:w-52">
+            <div class="rounded-[2rem] overflow-hidden border border-white/25 shadow-2xl rotate-2 bg-white/10 p-2">
+              <img src="logo.jpg" alt="Retrato do integrante da Develup" class="w-full aspect-[3/4] object-cover object-center rounded-[1.5rem]" loading="lazy" />
+            </div>
+            <figcaption class="text-center text-xs text-[#D8E6DF] mt-3 tracking-wide">Desenvolvimento por Develup</figcaption>
+          </figure>
           </div>
           <div class="absolute right-0 bottom-0 translate-x-12 translate-y-12 w-80 h-80 bg-[#B38B59]/25 rounded-full blur-3xl pointer-events-none"></div>
           <div class="absolute left-1/2 -top-16 w-72 h-72 rounded-full bg-emerald-400/15 blur-3xl pointer-events-none"></div>
@@ -777,10 +878,10 @@ class ReVesteApp {
           <div class="flex items-center justify-between mb-8">
             <div>
               <h2 class="text-2xl font-serif font-bold text-[#132E22] dark:text-[#E7EFEA]">
-                Autores do Projeto &amp; Papéis Técnicos
+                Equipe de Desenvolvimento
               </h2>
               <p class="text-xs text-[#5E6963] dark:text-[#8EA89C] mt-1">
-                Especialidades distribuídas em arquitetura, backend de estoque, modelo financeiro 80/20, segurança 2FA, usabilidade e qualidade.
+                Conheça as pessoas envolvidas na concepção e implementação técnica deste projeto.
               </p>
             </div>
             <span class="text-xs font-mono font-bold px-3 py-1 rounded-full bg-[#FAF7F2] dark:bg-[#142A1F] border border-[#E8E2D8] dark:border-[#223F32] text-[#8F6B3D] dark:text-[#CDB087]">
@@ -810,7 +911,7 @@ class ReVesteApp {
                   <!-- Specialty Badge -->
                   <div class="mb-3">
                     <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                      🎯 ${dev.especialidade}
+                      ${dev.especialidade}
                     </span>
                   </div>
 
@@ -827,7 +928,7 @@ class ReVesteApp {
                     <ul class="text-[11px] text-[#132E22] dark:text-[#E7EFEA] space-y-1">
                       ${dev.contribuicoes.map(c => `
                         <li class="flex items-center gap-1.5">
-                          <span class="text-emerald-700 dark:text-emerald-400 font-bold">✓</span>
+                          <span class="text-emerald-700 dark:text-emerald-400 font-bold"></span>
                           <span>${c}</span>
                         </li>
                       `).join('')}
@@ -837,10 +938,10 @@ class ReVesteApp {
 
                 <!-- Footer mock links -->
                 <div class="pt-3 border-t border-[#E8E2D8] dark:border-[#223F32] flex items-center justify-between text-xs">
-                  <span class="text-[10px] text-stone-400 font-mono">ReVeste Core Dev</span>
+                  <span class="text-[10px] text-stone-400 font-mono">Develup · Desenvolvimento</span>
                   <div class="flex items-center gap-2">
                     <a href="javascript:void(0)" onclick="app.showToast('Perfil acadêmico de ${dev.nome} validado no DRS.', 'info')" class="text-xs text-[#5E6963] dark:text-[#8EA89C] hover:text-emerald-700 dark:hover:text-emerald-400 transition" title="Ver Perfil">
-                      🔗 Portfólio
+                      Portfólio
                     </a>
                   </div>
                 </div>
@@ -849,37 +950,34 @@ class ReVesteApp {
           </div>
         </div>
 
-        <!-- Manifesto ReVeste -->
+        <!-- Sobre a Develup -->
         <div class="bg-white dark:bg-[#102219] rounded-3xl p-8 md:p-12 border border-[#E8E2D8] dark:border-[#223F32] shadow-xs space-y-6">
           <div class="max-w-3xl">
             <span class="text-xs font-bold uppercase tracking-wider text-[#8F6B3D] dark:text-[#CDB087]">Nosso Propósito</span>
             <h2 class="text-2xl md:text-3xl font-serif font-bold text-[#132E22] dark:text-[#E7EFEA] mt-1 mb-4">
-              O Manifesto ReVeste: Moda Circular com Rigor de Engenharia
+              Develup — ideias que ganham forma digital
             </h2>
             <p class="text-xs md:text-sm text-[#5E6963] dark:text-[#8EA89C] leading-relaxed mb-4">
-              A ReVeste nasceu da união entre a urgência ambiental da indústria têxtil e a clareza analítica da Engenharia de Software.
-              Acreditamos que para um marketplace de economia circular prosperar, ele necessita de transparência financeira absoluta (como a divisão 80/20 sem taxas ocultas),
-              rastreabilidade total do inventário e facilidade para que o próprio cliente possa ser um revendedor sustentável.
+              A Develup desenvolve soluções digitais com foco em clareza, usabilidade e identidade visual. Para este projeto, criamos a experiência web da ReVeste, uma plataforma conceitual de moda circular e revenda.
             </p>
             <p class="text-xs md:text-sm text-[#5E6963] dark:text-[#8EA89C] leading-relaxed">
-              Cada linha de código, regra de negócio e caso de teste foi formalmente especificado em nosso DRS para assegurar que compradores, brechós parceiros e administradores
-              tenham uma experiência confiável, rápida e inspiradora.
+              Nosso papel foi transformar os objetivos e requisitos do projeto em uma interface funcional, responsiva e consistente. A ReVeste é o projeto atendido; a Develup é a equipe responsável pelo desenvolvimento do site.
             </p>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-[#E8E2D8] dark:border-[#223F32]">
             <div class="p-4 bg-[#FAF7F2] dark:bg-[#142A1F] rounded-2xl border border-[#E8DBC9] dark:border-[#223F32]">
-              <span class="text-xl block mb-1">🌿</span>
+              <span class="text-xl block mb-1"></span>
               <strong class="text-xs font-bold text-[#132E22] dark:text-[#E7EFEA] block mb-1">Moda Sustentável</strong>
               <p class="text-[11px] text-[#5E6963] dark:text-[#8EA89C]">Extensão da vida útil das peças através de curadoria e revenda C2C simplificada.</p>
             </div>
             <div class="p-4 bg-[#FAF7F2] dark:bg-[#142A1F] rounded-2xl border border-[#E8DBC9] dark:border-[#223F32]">
-              <span class="text-xl block mb-1">⚖️</span>
+              <span class="text-xl block mb-1">️</span>
               <strong class="text-xs font-bold text-[#132E22] dark:text-[#E7EFEA] block mb-1">Transparência 80/20</strong>
               <p class="text-[11px] text-[#5E6963] dark:text-[#8EA89C]">Cálculo claro e aberto: o parceiro recebe 80% do valor bruto, sem pegadinhas.</p>
             </div>
             <div class="p-4 bg-[#FAF7F2] dark:bg-[#142A1F] rounded-2xl border border-[#E8DBC9] dark:border-[#223F32]">
-              <span class="text-xl block mb-1">🧪</span>
+              <span class="text-xl block mb-1"></span>
               <strong class="text-xs font-bold text-[#132E22] dark:text-[#E7EFEA] block mb-1">Qualidade Comprovada</strong>
               <p class="text-[11px] text-[#5E6963] dark:text-[#8EA89C]">Suíte viva de 8 casos de teste de aceite executáveis diretamente no navegador.</p>
             </div>
@@ -941,11 +1039,11 @@ class ReVesteApp {
         </section>
 
         <section class="reveste-benefits" aria-label="Benefícios ReVeste">
-          <div class="reveste-benefit"><span class="reveste-benefit-icon">♧</span><div><strong>Moda Sustentável</strong><p>Mais estilo, menos impacto.</p></div></div>
-          <div class="reveste-benefit"><span class="reveste-benefit-icon">♻</span><div><strong>Economia Circular</strong><p>Consuma, revenda, renove.</p></div></div>
-          <div class="reveste-benefit"><span class="reveste-benefit-icon">♡</span><div><strong>Compra Segura</strong><p>Seus dados protegidos.</p></div></div>
+          <div class="reveste-benefit"><span class="reveste-benefit-icon"></span><div><strong>Moda Sustentável</strong><p>Mais estilo, menos impacto.</p></div></div>
+          <div class="reveste-benefit"><span class="reveste-benefit-icon"></span><div><strong>Economia Circular</strong><p>Consuma, revenda, renove.</p></div></div>
+          <div class="reveste-benefit"><span class="reveste-benefit-icon"></span><div><strong>Compra Segura</strong><p>Seus dados protegidos.</p></div></div>
           <div class="reveste-benefit"><span class="reveste-benefit-icon">⇢</span><div><strong>Entrega Nacional e Internacional</strong><p>Do Brasil para o mundo.</p></div></div>
-          <div class="reveste-benefit"><span class="reveste-benefit-icon">♡</span><div><strong>Comunidade Consciente</strong><p>Juntos por um futuro melhor.</p></div></div>
+          <div class="reveste-benefit"><span class="reveste-benefit-icon"></span><div><strong>Comunidade Consciente</strong><p>Juntos por um futuro melhor.</p></div></div>
         </section>
 
         <div class="catalog-shell" id="reveste-catalogo">
@@ -966,8 +1064,8 @@ class ReVesteApp {
           <div class="flex items-center gap-3 w-full md:w-auto">
             <select onchange="app.setFilterType(this.value)" class="text-xs bg-[#FAF7F2] dark:bg-[#142A1F] border border-[#E8E2D8] dark:border-[#223F32] text-[#1A2821] dark:text-[#E7EFEA] rounded-xl px-3 py-2 font-medium focus:ring-2 focus:ring-emerald-700 focus:outline-none">
               <option value="todos" ${this.activeFilterType === 'todos' ? 'selected' : ''}>Todos os Produtos</option>
-              <option value="novo" ${this.activeFilterType === 'novo' ? 'selected' : ''}>✨ Apenas Novos (ReVeste)</option>
-              <option value="revenda" ${this.activeFilterType === 'revenda' ? 'selected' : ''}>♻️ Apenas Revenda & Brechó</option>
+              <option value="novo" ${this.activeFilterType === 'novo' ? 'selected' : ''}> Apenas Novos (ReVeste)</option>
+              <option value="revenda" ${this.activeFilterType === 'revenda' ? 'selected' : ''}>️ Apenas Revenda & Brechó</option>
             </select>
 
             <div class="relative flex-1 md:w-64">
@@ -979,7 +1077,7 @@ class ReVesteApp {
                 oninput="app.setSearch(this.value)"
                 class="w-full text-xs bg-[#FAF7F2] dark:bg-[#142A1F] border border-[#E8E2D8] dark:border-[#223F32] text-[#1A2821] dark:text-[#E7EFEA] rounded-xl pl-8 pr-3 py-2 focus:ring-2 focus:ring-emerald-700 focus:outline-none"
               />
-              <span class="absolute left-2.5 top-2.5 text-stone-400 text-xs">🔍</span>
+              <span class="absolute left-2.5 top-2.5 text-stone-400 text-xs"></span>
             </div>
           </div>
         </div>
@@ -996,7 +1094,7 @@ class ReVesteApp {
 
         ${filtered.length === 0 ? `
           <div class="text-center py-20 bg-white dark:bg-[#102219] rounded-3xl border border-[#E8E2D8] dark:border-[#1F382B]">
-            <span class="text-4xl mb-3 block">👗</span>
+            <span class="text-4xl mb-3 block"></span>
             <h3 class="text-lg font-bold text-stone-800 dark:text-stone-200">Nenhum produto encontrado</h3>
             <p class="text-xs text-stone-500 mt-1 max-w-sm mx-auto">Tente ajustar seus termos de busca ou filtros de categoria.</p>
             <button onclick="app.activeCategory='Todos'; app.searchQuery=''; app.activeFilterType='todos'; app.render();" class="mt-4 px-4 py-2 bg-[#065F46] text-white text-xs rounded-xl font-medium">Limpar Filtros</button>
@@ -1030,11 +1128,11 @@ class ReVesteApp {
           <div class="absolute top-3 left-3 flex flex-col gap-1.5 items-start">
             ${p.tipo === 'novo' ? `
               <span class="badge-official text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-xs backdrop-blur-md">
-                ✨ Oficial ReVeste
+                 Oficial ReVeste
               </span>
             ` : `
               <span class="badge-vintage text-[10px] font-bold px-2.5 py-0.5 rounded-full shadow-xs backdrop-blur-md">
-                ♻️ Revenda Curada
+                ️ Revenda Curada
               </span>
             `}
             <span class="bg-[#0B1C15]/75 text-white text-[10px] font-medium px-2 py-0.5 rounded-full backdrop-blur-sm">
@@ -1048,7 +1146,7 @@ class ReVesteApp {
               class="absolute top-3 right-3 w-7 h-7 bg-white/90 dark:bg-stone-900/90 hover:bg-white text-emerald-800 dark:text-emerald-300 rounded-full shadow-md flex items-center justify-center text-xs font-bold transition hover:scale-110" 
               title="Admin: Alterar Imagem desta Peça"
             >
-              🖼️
+              ️
             </button>
           ` : ''}
 
@@ -1097,7 +1195,7 @@ class ReVesteApp {
                 title="Ver Detalhes e Regra de Divisão 20%" 
                 class="p-2 rounded-xl border border-[#E8E2D8] dark:border-[#223F32] text-[#5E6963] dark:text-[#8EA89C] hover:bg-[#FAF7F2] dark:hover:bg-[#142A1F] transition text-xs"
               >
-                👁️
+                ️
               </button>
 
               <button 
@@ -1105,7 +1203,7 @@ class ReVesteApp {
                 ${isOut ? 'disabled' : ''} 
                 class="px-3.5 py-2 rounded-xl ${isOut ? 'bg-stone-200 dark:bg-stone-800 text-stone-400 cursor-not-allowed' : 'bg-[#065F46] hover:bg-[#047857] text-white shadow-xs'} text-xs font-bold transition flex items-center gap-1.5"
               >
-                🛒 ${isOut ? 'Indisponível' : 'Adicionar'}
+                 ${isOut ? 'Indisponível' : 'Adicionar'}
               </button>
             </div>
           </div>
@@ -1144,7 +1242,7 @@ class ReVesteApp {
         <div class="bg-white dark:bg-[#102219] rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl border border-[#E8E2D8] dark:border-[#1F382B] max-h-[90vh] flex flex-col">
           <div class="p-4 border-b border-[#E8E2D8] dark:border-[#1F382B] flex items-center justify-between bg-[#FAF7F2] dark:bg-[#142A1F]">
             <span class="text-xs font-bold uppercase tracking-wider text-[#8F6B3D] dark:text-[#CDB087]">Detalhes do Produto & Regra Comercial</span>
-            <button onclick="app.closeModal()" class="w-8 h-8 rounded-full bg-stone-200 dark:bg-stone-800 hover:bg-stone-300 text-stone-700 dark:text-stone-300 flex items-center justify-center text-sm font-bold">✕</button>
+            <button onclick="app.closeModal()" class="w-8 h-8 rounded-full bg-stone-200 dark:bg-stone-800 hover:bg-stone-300 text-stone-700 dark:text-stone-300 flex items-center justify-center text-sm font-bold"></button>
           </div>
 
           <div class="p-6 overflow-y-auto space-y-6">
@@ -1163,7 +1261,7 @@ class ReVesteApp {
                     onclick="app.closeModal(); app.openChangeImageModal(${p.id});" 
                     class="mt-2.5 py-2 px-3 bg-[#FAF7F2] dark:bg-[#142A1F] hover:bg-[#F4ECE1] text-[#065F46] dark:text-[#34D399] border border-[#E8DBC9] dark:border-[#223F32] rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-2xs"
                   >
-                    🖼️ Alterar Imagem desta Peça (Admin)
+                    ️ Alterar Imagem desta Peça (Admin)
                   </button>
                 ` : ''}
               </div>
@@ -1209,7 +1307,7 @@ class ReVesteApp {
                     ${p.quantidade <= 0 ? 'disabled' : ''}
                     class="px-5 py-3 rounded-2xl ${p.quantidade <= 0 ? 'bg-stone-300 dark:bg-stone-800 text-stone-500 cursor-not-allowed' : 'bg-[#065F46] hover:bg-[#047857] text-white shadow-lg'} font-semibold text-xs transition"
                   >
-                    ${p.quantidade <= 0 ? 'Item Esgotado' : '🛒 Comprar Agora'}
+                    ${p.quantidade <= 0 ? 'Item Esgotado' : ' Comprar Agora'}
                   </button>
                 </div>
               </div>
@@ -1218,7 +1316,7 @@ class ReVesteApp {
             <!-- RF-07 / RN-01 / RN-02: Transparência Financeira -->
             <div class="p-4 bg-[#FAF7F2] dark:bg-[#142A1F] border border-[#E8DBC9] dark:border-[#223F32] rounded-2xl">
               <div class="flex items-center gap-2 mb-2">
-                <span class="text-base">⚖️</span>
+                <span class="text-base">️</span>
                 <h4 class="text-xs font-bold text-[#8F6B3D] dark:text-[#CDB087] uppercase tracking-wider">
                   Transparência Financeira ReVeste (RF-07, RN-01, RN-02)
                 </h4>
@@ -1270,13 +1368,13 @@ class ReVesteApp {
         <div class="bg-white dark:bg-[#102219] rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl border border-[#E8E2D8] dark:border-[#1F382B] max-h-[92vh] flex flex-col">
           <div class="p-4 border-b border-[#E8E2D8] dark:border-[#1F382B] flex items-center justify-between bg-[#FAF7F2] dark:bg-[#142A1F]">
             <div class="flex items-center gap-2">
-              <span class="text-emerald-800 dark:text-emerald-400 text-lg">🖼️</span>
+              <span class="text-emerald-800 dark:text-emerald-400 text-lg">️</span>
               <div>
-                <h3 class="text-xs font-bold uppercase tracking-wider text-[#132E22] dark:text-[#E7EFEA]">Alterar Imagem do Produto (Admin)</h3>
+                <h3 class="text-xs font-bold uppercase tracking-wider text-[#132E22] dark:text-[#E7EFEA]">Alterar Foto do Produto</h3>
                 <span class="text-[11px] text-[#8F6B3D] dark:text-[#CDB087] font-medium block">Produto #${p.id}: ${p.nome}</span>
               </div>
             </div>
-            <button onclick="app.closeModal()" class="w-8 h-8 rounded-full bg-stone-200 dark:bg-stone-800 hover:bg-stone-300 text-stone-700 dark:text-stone-300 flex items-center justify-center text-sm font-bold">✕</button>
+            <button onclick="app.closeModal()" class="w-8 h-8 rounded-full bg-stone-200 dark:bg-stone-800 hover:bg-stone-300 text-stone-700 dark:text-stone-300 flex items-center justify-center text-sm font-bold"></button>
           </div>
 
           <div class="p-6 overflow-y-auto space-y-6 text-xs">
@@ -1297,14 +1395,14 @@ class ReVesteApp {
                   onclick="app.setImagePreview('${svgFallback}')" 
                   class="w-full py-1.5 px-2 bg-emerald-100 dark:bg-emerald-950 text-emerald-900 dark:text-emerald-300 rounded-lg text-[10px] font-bold border border-emerald-300 dark:border-emerald-800 transition"
                 >
-                  ⚡ Usar Ilustração Vetorial SVG
+                   Usar Ilustração Vetorial SVG
                 </button>
               </div>
 
               <div class="sm:col-span-2 space-y-4">
                 <div class="p-4 bg-[#FAF7F2] dark:bg-[#142A1F] rounded-2xl border border-[#E8E2D8] dark:border-[#223F32]">
                   <label class="block font-bold text-[#132E22] dark:text-[#E7EFEA] mb-1 flex items-center gap-1.5">
-                    <span>📁 1. Carregar do Computador (JPG/PNG/WEBP)</span>
+                    <span> 1. Carregar do Computador (JPG/PNG/WEBP)</span>
                   </label>
                   <p class="text-[11px] text-[#5E6963] dark:text-[#8EA89C] mb-2">Selecione qualquer foto do seu computador para transformar em imagem desta peça:</p>
                   <input 
@@ -1318,7 +1416,7 @@ class ReVesteApp {
 
                 <div class="p-4 bg-[#FAF7F2] dark:bg-[#142A1F] rounded-2xl border border-[#E8E2D8] dark:border-[#223F32]">
                   <label class="block font-bold text-[#132E22] dark:text-[#E7EFEA] mb-1">
-                    🌐 2. Ou cole uma URL de Imagem da Web
+                     2. Ou cole uma URL de Imagem da Web
                   </label>
                   <input 
                     type="url" 
@@ -1335,7 +1433,7 @@ class ReVesteApp {
             <div class="space-y-3 pt-3 border-t border-[#E8E2D8] dark:border-[#223F32]">
               <div class="flex items-center justify-between">
                 <span class="font-bold text-[#132E22] dark:text-[#E7EFEA] uppercase tracking-wider text-[11px]">
-                  ✨ 3. Ou escolha uma foto da Galeria Curada ReVeste:
+                   3. Ou escolha uma foto da Galeria Curada ReVeste:
                 </span>
                 <span class="text-[10px] text-[#8F6B3D] dark:text-[#CDB087]">12 opções prontas</span>
               </div>
@@ -1370,7 +1468,7 @@ class ReVesteApp {
               onclick="app.saveProductImage(${p.id})" 
               class="px-6 py-2.5 bg-[#065F46] hover:bg-[#047857] text-white font-bold rounded-xl text-xs uppercase tracking-wider transition shadow-md shadow-emerald-900/25 flex items-center gap-1.5"
             >
-              💾 Salvar Nova Imagem
+               Salvar Nova Imagem
             </button>
           </div>
         </div>
@@ -1418,7 +1516,7 @@ class ReVesteApp {
     this.saveData();
     this.closeModal();
     this.render();
-    this.showToast(`🖼️ Imagem de "${p.nome}" atualizada com sucesso!`, 'success');
+    this.showToast(`️ Imagem de "${p.nome}" atualizada com sucesso!`, 'success');
   }
 
   closeModal() {
@@ -1477,8 +1575,8 @@ class ReVesteApp {
 
     if (this.data.carrinho.length === 0) {
       itemsContainer.innerHTML = `
-        <div class="text-center py-20 text-stone-400">
-          <span class="text-4xl block mb-2">🛍️</span>
+        <div class="cart-empty-state text-center py-20 text-stone-400">
+          <span class="text-4xl block mb-2">️</span>
           <p class="text-sm font-medium">Sua sacola de compras está vazia.</p>
           <button onclick="app.closeCartDrawer(); app.setTab('loja');" class="mt-4 px-4 py-2 bg-[#065F46] text-white rounded-xl text-xs font-semibold">
             Explorar Catálogo
@@ -1488,11 +1586,11 @@ class ReVesteApp {
       summaryContainer.innerHTML = '';
     } else {
       itemsContainer.innerHTML = this.data.carrinho.map(item => `
-        <div class="flex items-center gap-3 p-3 bg-[#FAF7F2] dark:bg-[#142A1F] rounded-2xl border border-[#E8E2D8] dark:border-[#223F32]">
+        <div class="cart-line-item flex items-center gap-3 p-3 bg-[#FAF7F2] dark:bg-[#142A1F] rounded-2xl border border-[#E8E2D8] dark:border-[#223F32]">
           <img 
             src="${item.imagem}" 
             alt="${item.nome}" 
-            class="w-16 h-16 object-cover rounded-xl" 
+            class="cart-product-image w-16 h-16 object-cover rounded-xl" 
             onerror="this.src = app.getFashionPlaceholder('Vestuário', '${item.nome}', 'Padrão', '${item.tipo}'); this.onerror=null;"
           />
           <div class="flex-1 min-w-0">
@@ -1504,13 +1602,13 @@ class ReVesteApp {
             <button onclick="app.updateCartQtd(${item.id}, -1)" class="w-6 h-6 rounded-lg bg-stone-200 dark:bg-stone-800 hover:bg-stone-300 text-stone-700 dark:text-stone-300 flex items-center justify-center text-xs font-bold">-</button>
             <span class="text-xs font-bold px-1">${item.qtd}</span>
             <button onclick="app.updateCartQtd(${item.id}, 1)" class="w-6 h-6 rounded-lg bg-stone-200 dark:bg-stone-800 hover:bg-stone-300 text-stone-700 dark:text-stone-300 flex items-center justify-center text-xs font-bold">+</button>
-            <button onclick="app.removeFromCart(${item.id})" class="text-red-500 hover:text-red-700 p-1 text-xs ml-1" title="Remover">🗑️</button>
+            <button onclick="app.removeFromCart(${item.id})" class="cart-remove-button text-red-500 hover:text-red-700 p-1 text-xs ml-1" title="Remover" aria-label="Remover item">️</button>
           </div>
         </div>
       `).join('');
 
       summaryContainer.innerHTML = `
-        <div class="p-4 bg-[#FAF7F2] dark:bg-[#142A1F] rounded-2xl border border-[#E8E2D8] dark:border-[#223F32] space-y-2 mb-4">
+        <div class="cart-summary-card p-4 bg-[#FAF7F2] dark:bg-[#142A1F] rounded-2xl border border-[#E8E2D8] dark:border-[#223F32] space-y-2 mb-4">
           <div class="flex justify-between text-xs text-[#5E6963] dark:text-[#8EA89C]">
             <span>Subtotal dos Itens:</span>
             <strong class="text-[#132E22] dark:text-[#E7EFEA]">R$ ${subtotal.toFixed(2).replace('.', ',')}</strong>
@@ -1525,7 +1623,7 @@ class ReVesteApp {
           </div>
         </div>
         <button onclick="app.openCheckoutModal()" class="w-full py-3.5 rounded-2xl bg-[#065F46] hover:bg-[#047857] text-white font-bold text-xs uppercase tracking-wider transition shadow-lg shadow-emerald-900/25 flex items-center justify-center gap-2">
-          Finalizar Pedido com 2FA 🔒
+          Finalizar Pedido com 2FA 
         </button>
       `;
     }
@@ -1580,10 +1678,10 @@ class ReVesteApp {
         <div class="bg-white dark:bg-[#102219] rounded-3xl max-w-xl w-full overflow-hidden shadow-2xl border border-[#E8E2D8] dark:border-[#1F382B] max-h-[92vh] flex flex-col">
           <div class="p-4 border-b border-[#E8E2D8] dark:border-[#1F382B] flex items-center justify-between bg-[#FAF7F2] dark:bg-[#142A1F]">
             <div class="flex items-center gap-2">
-              <span class="text-emerald-800 dark:text-emerald-400 font-bold">🔒</span>
+              <span class="text-emerald-800 dark:text-emerald-400 font-bold"></span>
               <span class="text-xs font-bold uppercase tracking-wider text-[#132E22] dark:text-[#E7EFEA]">Finalização de Pedido & Checkout Seguro</span>
             </div>
-            <button onclick="app.closeModal()" class="w-8 h-8 rounded-full bg-stone-200 dark:bg-stone-800 hover:bg-stone-300 text-stone-700 dark:text-stone-300 flex items-center justify-center text-sm font-bold">✕</button>
+            <button onclick="app.closeModal()" class="w-8 h-8 rounded-full bg-stone-200 dark:bg-stone-800 hover:bg-stone-300 text-stone-700 dark:text-stone-300 flex items-center justify-center text-sm font-bold"></button>
           </div>
 
           <form onsubmit="app.processOrderSubmit(event)" class="p-6 overflow-y-auto space-y-5">
@@ -1619,7 +1717,7 @@ class ReVesteApp {
                 <label class="flex items-center gap-2 p-3 border dark:border-[#223F32] rounded-xl cursor-pointer transition has-[:checked]:border-emerald-600 has-[:checked]:bg-emerald-50/60 dark:has-[:checked]:bg-emerald-950/40">
                   <input type="radio" name="chk-tipo-destino" value="internacional" onchange="app.updateShippingPreview()" class="accent-emerald-700" />
                   <div>
-                    <strong class="text-xs block text-[#132E22] dark:text-[#E7EFEA]">🌐 Internacional</strong>
+                    <strong class="text-xs block text-[#132E22] dark:text-[#E7EFEA]"> Internacional</strong>
                     <span class="text-[10px] text-stone-500">DHL Express / Desembaraço</span>
                   </div>
                 </label>
@@ -1649,7 +1747,7 @@ class ReVesteApp {
             <div class="p-4 bg-emerald-50/80 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 rounded-2xl space-y-2">
               <div class="flex items-center justify-between">
                 <span class="text-xs font-bold text-emerald-950 dark:text-emerald-200 flex items-center gap-1.5">
-                  🛡️ Autenticação em 2 Fatores - 2FA (RNF-01, CT-06)
+                  ️ Autenticação em 2 Fatores - 2FA (RNF-01, CT-06)
                 </span>
                 <span class="text-[10px] bg-emerald-200 dark:bg-emerald-900 text-emerald-900 dark:text-emerald-100 font-semibold px-2 py-0.5 rounded-full">Obrigatório</span>
               </div>
@@ -1785,7 +1883,7 @@ class ReVesteApp {
     this.saveData();
     this.closeModal();
     this.renderHeader();
-    this.showToast(`🎉 Pedido ${newOrderId} concluído com sucesso! Estoque atualizado automaticamente.`, 'success');
+    this.showToast(` Pedido ${newOrderId} concluído com sucesso! Estoque atualizado automaticamente.`, 'success');
     this.setTab('rastreio');
   }
 
@@ -1793,12 +1891,13 @@ class ReVesteApp {
   // TAB 2: QUERO REVENDER (C2C PORTAL)
   // ==========================================
   renderRevender(container) {
+    this.pendingResaleImage = null;
     container.innerHTML = `
       <div class="animate-fade-in max-w-4xl mx-auto pb-16">
         <div class="bg-gradient-to-br from-[#063223] via-[#065F46] to-[#453118] rounded-3xl p-8 md:p-12 text-white shadow-xl mb-10 relative overflow-hidden border border-emerald-700/40">
           <div class="relative z-10 max-w-xl">
             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-[#F4ECE1]/20 text-tan-200 border border-[#F4ECE1]/30 mb-4">
-              ♻️ Moda Circular & Desapego Inteligente (RN-03 / RF-08)
+              ️ Moda Circular & Desapego Inteligente (RN-03 / RF-08)
             </span>
             <h1 class="text-3xl md:text-4xl font-serif font-bold mb-3">
               Dê uma nova vida às suas roupas na ReVeste
@@ -1895,13 +1994,23 @@ class ReVesteApp {
                 </div>
               </div>
 
-              <div>
-                <label class="block text-xs font-semibold text-[#132E22] dark:text-[#E7EFEA] mb-1">URL de Imagem / Foto</label>
-                <input type="url" id="res-imagem" placeholder="https://images.unsplash.com/..." value="https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=700&q=80" class="w-full text-xs bg-[#FAF7F2] dark:bg-[#142A1F] border border-[#E8E2D8] dark:border-[#223F32] text-[#1A2821] dark:text-[#E7EFEA] rounded-xl px-3 py-2 focus:ring-2 focus:ring-emerald-700 focus:outline-none" />
+              <div class="p-4 bg-[#FAF7F2] dark:bg-[#142A1F] border-2 border-dashed border-[#D5C1A6] dark:border-[#315541] rounded-2xl">
+                <label for="res-imagem-arquivo" class="block text-xs font-bold text-[#132E22] dark:text-[#E7EFEA] mb-1">Foto da peça <span class="text-red-600">*</span></label>
+                <p class="text-[11px] text-[#5E6963] dark:text-[#8EA89C] mb-3">Envie uma foto real da roupa que deseja vender. A foto é obrigatória para publicar o anúncio. JPG, PNG ou WEBP, até 8 MB.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-[120px_1fr] gap-3 items-center">
+                  <div class="aspect-[4/5] w-full max-w-[120px] overflow-hidden rounded-xl border border-[#E8DBC9] dark:border-[#315541] bg-white dark:bg-[#102219] flex items-center justify-center">
+                    <img id="res-imagem-preview" src="" alt="Pré-visualização da foto da peça" class="hidden w-full h-full object-cover" />
+                    <span id="res-imagem-placeholder" class="px-2 text-center text-[10px] text-stone-400">Nenhuma foto selecionada</span>
+                  </div>
+                  <div>
+                    <input type="file" id="res-imagem-arquivo" required accept="image/jpeg,image/png,image/webp" onchange="app.handleResaleImageUpload(event)" class="w-full text-xs text-[#5E6963] dark:text-[#8EA89C] file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-[#065F46] file:text-white hover:file:bg-[#047857] cursor-pointer" />
+                    <p id="res-imagem-status" class="mt-2 text-[11px] text-[#5E6963] dark:text-[#8EA89C]">Selecione uma foto para ver a prévia.</p>
+                  </div>
+                </div>
               </div>
 
               <button type="submit" class="w-full py-3.5 rounded-2xl bg-[#065F46] hover:bg-[#047857] text-white font-bold text-xs uppercase tracking-wider transition shadow-lg shadow-emerald-900/25">
-                Enviar Peça para Curadoria ReVeste 🚀
+                Enviar Peça para Curadoria ReVeste 
               </button>
             </form>
           </div>
@@ -1911,19 +2020,19 @@ class ReVesteApp {
               <h4 class="text-xs font-bold text-[#132E22] dark:text-[#E7EFEA] uppercase tracking-wider mb-3">Como Funciona a Revenda</h4>
               <ul class="text-xs text-[#5E6963] dark:text-[#8EA89C] space-y-3">
                 <li class="flex items-start gap-2">
-                  <span class="text-emerald-700 dark:text-emerald-400 font-bold">✓</span>
+                  <span class="text-emerald-700 dark:text-emerald-400 font-bold"></span>
                   <span><strong>1. Cadastro Simples:</strong> Você cadastra as fotos e dados da peça.</span>
                 </li>
                 <li class="flex items-start gap-2">
-                  <span class="text-emerald-700 dark:text-emerald-400 font-bold">✓</span>
+                  <span class="text-emerald-700 dark:text-emerald-400 font-bold"></span>
                   <span><strong>2. Curadoria:</strong> Nossa equipe avalia a autenticidade e estado de conservação.</span>
                 </li>
                 <li class="flex items-start gap-2">
-                  <span class="text-emerald-700 dark:text-emerald-400 font-bold">✓</span>
+                  <span class="text-emerald-700 dark:text-emerald-400 font-bold"></span>
                   <span><strong>3. Publicação:</strong> O item entra no catálogo com o selo "Revenda Curada".</span>
                 </li>
                 <li class="flex items-start gap-2">
-                  <span class="text-emerald-700 dark:text-emerald-400 font-bold">✓</span>
+                  <span class="text-emerald-700 dark:text-emerald-400 font-bold"></span>
                   <span><strong>4. Pagamento 80%:</strong> Quando vendido, você recebe 80% do valor do produto.</span>
                 </li>
               </ul>
@@ -1969,6 +2078,61 @@ class ReVesteApp {
     if (elComissao) elComissao.textContent = `R$ ${comissao}`;
   }
 
+  handleResaleImageUpload(e) {
+    const file = e.target.files && e.target.files[0];
+    const preview = document.getElementById('res-imagem-preview');
+    const placeholder = document.getElementById('res-imagem-placeholder');
+    const status = document.getElementById('res-imagem-status');
+    if (!file) {
+      this.pendingResaleImage = null;
+      if (preview) preview.classList.add('hidden');
+      if (placeholder) placeholder.classList.remove('hidden');
+      if (status) status.textContent = 'Selecione uma foto para ver a prévia.';
+      return;
+    }
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      e.target.value = '';
+      this.pendingResaleImage = null;
+      this.showToast('Formato inválido. Envie uma imagem JPG, PNG ou WEBP.', 'error');
+      return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      e.target.value = '';
+      this.pendingResaleImage = null;
+      this.showToast('A imagem deve ter no máximo 8 MB.', 'error');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const image = new Image();
+      image.onload = () => {
+        // Resize/compress uploaded photos to keep browser storage manageable.
+        const maxSide = 1200;
+        const scale = Math.min(1, maxSide / Math.max(image.width, image.height));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, Math.round(image.width * scale));
+        canvas.height = Math.max(1, Math.round(image.height * scale));
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+        this.pendingResaleImage = canvas.toDataURL('image/jpeg', 0.82);
+        if (preview) {
+          preview.src = this.pendingResaleImage;
+          preview.classList.remove('hidden');
+        }
+        if (placeholder) placeholder.classList.add('hidden');
+        if (status) status.textContent = `Foto selecionada: ${file.name}`;
+      };
+      image.onerror = () => {
+        this.pendingResaleImage = null;
+        e.target.value = '';
+        this.showToast('Não foi possível abrir essa imagem. Tente outro arquivo.', 'error');
+      };
+      image.src = event.target.result;
+    };
+    reader.onerror = () => this.showToast('Falha ao ler a imagem. Tente novamente.', 'error');
+    reader.readAsDataURL(file);
+  }
+
   submitResale(e) {
     e.preventDefault();
     const nome = document.getElementById('res-nome').value.trim();
@@ -1978,7 +2142,12 @@ class ReVesteApp {
     const condicao = document.getElementById('res-condicao').value;
     const desc = document.getElementById('res-desc').value.trim();
     const preco = parseFloat(document.getElementById('res-preco').value) || 0;
-    const imagem = document.getElementById('res-imagem').value.trim() || this.getFashionPlaceholder(categoria, nome, cor, 'revenda');
+    const imagem = this.pendingResaleImage;
+    if (!imagem) {
+      this.showToast('Envie uma foto da peça antes de cadastrar o anúncio.', 'error');
+      document.getElementById('res-imagem-arquivo')?.focus();
+      return;
+    }
 
     const newSubId = `SOL-0${this.data.solicitacoesRevenda.length + 1}`;
     const repasse80 = preco * 0.80;
@@ -2017,7 +2186,7 @@ class ReVesteApp {
     this.data.produtos.unshift(newProd);
 
     this.saveData();
-    this.showToast(`✨ Solicitação ${newSubId} cadastrada e aprovada com sucesso! Produto agora está visível no catálogo.`, 'success');
+    this.showToast(` Solicitação ${newSubId} cadastrada e aprovada com sucesso! Produto agora está visível no catálogo.`, 'success');
     this.render();
   }
 
@@ -2046,7 +2215,7 @@ class ReVesteApp {
             class="flex-1 text-xs bg-[#FAF7F2] dark:bg-[#142A1F] border border-[#E8E2D8] dark:border-[#223F32] text-[#1A2821] dark:text-[#E7EFEA] rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-emerald-700 focus:outline-none font-mono"
           />
           <button onclick="app.searchTrackingCode()" class="px-5 py-2.5 bg-[#065F46] hover:bg-[#047857] text-white text-xs font-semibold rounded-xl transition flex items-center justify-center gap-2">
-            🔍 Rastrear Objeto
+             Rastrear Objeto
           </button>
         </div>
 
@@ -2066,7 +2235,7 @@ class ReVesteApp {
                     o.status === 'entregue' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' :
                     o.status === 'em_transito' ? 'bg-[#F4ECE1] text-[#7F5E33] dark:bg-[#1F2822] dark:text-[#CDB087]' : 'bg-amber-100 text-amber-800'
                   }">
-                    ${o.status === 'entregue' ? '✓ Entregue' : o.status === 'em_transito' ? '🚚 Em Trânsito' : '📦 Em Separação'}
+                    ${o.status === 'entregue' ? ' Entregue' : o.status === 'em_transito' ? ' Em Trânsito' : ' Em Separação'}
                   </span>
                 </div>
                 <div class="text-xs text-[#5E6963] dark:text-[#8EA89C] mb-2 truncate">Para: ${o.comprador}</div>
@@ -2095,7 +2264,7 @@ class ReVesteApp {
           <div>
             <div class="flex items-center gap-2 mb-1">
               <span class="text-xs px-2.5 py-0.5 rounded-full font-bold ${isIntl ? 'bg-[#F4ECE1] text-[#7F5E33] dark:bg-[#1F2822] dark:text-[#CDB087]' : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'}">
-                ${isIntl ? '🌐 Remessa Internacional' : '🇧🇷 Envio Nacional'}
+                ${isIntl ? ' Remessa Internacional' : '🇧🇷 Envio Nacional'}
               </span>
               <span class="text-xs text-stone-400 font-mono">${o.id}</span>
             </div>
@@ -2132,7 +2301,7 @@ class ReVesteApp {
             ${o.historicoRastreio.map((step, idx) => `
               <div class="timeline-step ${idx === 0 ? 'completed' : ''} flex items-start gap-4">
                 <div class="w-7 h-7 rounded-full ${idx === 0 ? 'bg-[#065F46] text-white' : 'bg-stone-200 dark:bg-stone-800 text-stone-600 dark:text-stone-300'} flex items-center justify-center text-xs font-bold flex-shrink-0 shadow-2xs">
-                  ${idx === 0 ? '📍' : '✓'}
+                  ${idx === 0 ? '' : ''}
                 </div>
                 <div class="flex-1 bg-[#FAF7F2] dark:bg-[#142A1F] p-3 rounded-2xl border border-[#E8E2D8] dark:border-[#223F32]">
                   <div class="flex items-center justify-between mb-1">
@@ -2140,7 +2309,7 @@ class ReVesteApp {
                     <span class="text-[10px] text-stone-400 font-mono">${step.data}</span>
                   </div>
                   <span class="text-[11px] text-[#5E6963] dark:text-[#8EA89C] flex items-center gap-1">
-                    🏢 ${step.local}
+                     ${step.local}
                   </span>
                 </div>
               </div>
@@ -2245,7 +2414,7 @@ class ReVesteApp {
 
           <div class="flex items-center gap-2">
             <button onclick="app.downloadRelatorioFinanceiro()" class="px-4 py-2 bg-[#065F46] hover:bg-[#047857] text-white rounded-xl text-xs font-semibold shadow-xs flex items-center gap-1.5">
-              📥 Baixar Extrato CSV
+               Baixar Extrato CSV
             </button>
           </div>
         </div>
@@ -2272,7 +2441,7 @@ class ReVesteApp {
 
         <div class="bg-gradient-to-r from-[#FAF7F2] via-[#F4ECE1] to-emerald-50/50 dark:from-[#142A1F] dark:to-[#0F2218] p-6 rounded-3xl border border-[#E8DBC9] dark:border-[#223F32]">
           <div class="flex items-center gap-2 mb-3">
-            <span class="text-lg">🧮</span>
+            <span class="text-lg"></span>
             <h3 class="text-xs font-bold text-[#8F6B3D] dark:text-[#CDB087] uppercase tracking-wider">
               Simulador de Divisão Comercial de Venda (CT-03 / CT-04 / UC-03)
             </h3>
@@ -2393,19 +2562,19 @@ class ReVesteApp {
 
           <div class="flex items-center gap-2">
             <button onclick="app.openNewProductModal()" class="px-4 py-2 bg-[#065F46] hover:bg-[#047857] text-white rounded-xl text-xs font-semibold shadow-xs flex items-center gap-1.5">
-              ➕ Novo Produto
+               Novo Produto
             </button>
             <button onclick="app.exportStockToCSV()" class="px-4 py-2 bg-[#8F6B3D] hover:bg-[#7F5E33] text-white rounded-xl text-xs font-semibold shadow-xs flex items-center gap-1.5">
-              📊 Exportar Estoque CSV
+               Exportar Estoque CSV
             </button>
           </div>
         </div>
 
-        <div class="bg-white dark:bg-[#102219] rounded-3xl p-6 md:p-8 border border-[#E8E2D8] dark:border-[#1F382B] shadow-xs space-y-6">
+        <div class="${this.data.currentUser.perfil !== 'admin' ? 'hidden' : ''} bg-white dark:bg-[#102219] rounded-3xl p-6 md:p-8 border border-[#E8E2D8] dark:border-[#1F382B] shadow-xs space-y-6">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E8E2D8] dark:border-[#1F382B]">
             <div>
               <div class="flex items-center gap-2 mb-1">
-                <span class="text-lg">📊</span>
+                <span class="text-lg"></span>
                 <h3 class="text-sm font-bold text-[#132E22] dark:text-[#E7EFEA] uppercase tracking-wider">
                   Integração com Planilha de Estoque (RF-03, UC-02, CT-01)
                 </h3>
@@ -2417,20 +2586,20 @@ class ReVesteApp {
 
             <div class="flex items-center gap-2">
               <button onclick="app.downloadSampleCSVTemplate()" class="px-3 py-1.5 bg-[#FAF7F2] dark:bg-[#142A1F] hover:bg-[#F4ECE1] text-[#8F6B3D] dark:text-[#CDB087] text-xs font-semibold rounded-xl border border-[#E8DBC9] dark:border-[#223F32]">
-                📄 Baixar Modelo CSV
+                 Baixar Modelo CSV
               </button>
             </div>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="p-6 border-2 border-dashed border-[#D5C1A6] dark:border-[#223F32] hover:border-emerald-700 rounded-2xl bg-[#FAF7F2] dark:bg-[#142A1F] text-center transition flex flex-col items-center justify-center">
-              <span class="text-3xl mb-2">📁</span>
+              <span class="text-3xl mb-2"></span>
               <p class="text-xs font-bold text-[#132E22] dark:text-[#E7EFEA] mb-1">Selecione o arquivo da planilha para sincronizar</p>
-              <p class="text-[11px] text-[#5E6963] dark:text-[#8EA89C] mb-4">Formatos suportados: .csv com colunas (id, nome, categoria, tamanho, cor, preco, quantidade, tipo, vendedor)</p>
+              <p class="text-[11px] text-[#5E6963] dark:text-[#8EA89C] mb-4">Formatos: Excel (.xlsx, .xls, .xlsm), OpenDocument (.ods), CSV, TSV e planilhas exportadas de outros sistemas. A primeira aba e as colunas reconhecidas serão importadas.</p>
               
-              <input type="file" id="csv-file-input" accept=".csv,.txt" onchange="app.handleCSVFileSelected(event)" class="hidden" />
+              <input type="file" id="csv-file-input" accept=".csv,.txt,.tsv,.xlsx,.xls,.xlsm,.ods,.fods,.numbers,.xml" onchange="app.handleCSVFileSelected(event)" class="hidden" />
               <button onclick="document.getElementById('csv-file-input').click()" class="px-5 py-2.5 bg-[#065F46] hover:bg-[#047857] text-white text-xs font-semibold rounded-xl transition shadow-xs">
-                Carregar Arquivo CSV
+                Importar Planilha
               </button>
             </div>
 
@@ -2444,7 +2613,7 @@ class ReVesteApp {
 
               <div class="flex flex-col sm:flex-row gap-2">
                 <button onclick="app.loadDefaultTestCSV()" class="flex-1 py-2.5 bg-emerald-800 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl transition shadow-xs">
-                  ⚡ Sincronizar Planilha Padrão (CT-01)
+                   Sincronizar Planilha Padrão (CT-01)
                 </button>
               </div>
             </div>
@@ -2454,8 +2623,8 @@ class ReVesteApp {
             <span class="text-[11px] font-bold uppercase tracking-wider text-[#8F6B3D] dark:text-[#CDB087] block mb-2">Última Sincronização Registrada</span>
             ${this.data.historicoSincronizacao.map(h => `
               <div class="text-xs text-[#5E6963] dark:text-[#8EA89C] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <span>🕒 <strong>${h.data}</strong> por ${h.responsavel}</span>
-                <span class="text-emerald-800 dark:text-emerald-400 font-bold">✓ Status: ${h.status} (${h.itensProcessados} itens processados)</span>
+                <span> <strong>${h.data}</strong> por ${h.responsavel}</span>
+                <span class="text-emerald-800 dark:text-emerald-400 font-bold"> Status: ${h.status} (${h.itensProcessados} itens processados)</span>
               </div>
             `).join('')}
           </div>
@@ -2464,7 +2633,7 @@ class ReVesteApp {
         <div class="bg-white dark:bg-[#102219] rounded-3xl border border-[#E8E2D8] dark:border-[#1F382B] overflow-hidden shadow-xs">
           <div class="p-5 border-b border-[#E8E2D8] dark:border-[#1F382B] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h3 class="text-xs font-bold text-[#132E22] dark:text-[#E7EFEA] uppercase tracking-wider">Inventário de Produtos & Imagens</h3>
+              <h3 class="text-xs font-bold text-[#132E22] dark:text-[#E7EFEA] uppercase tracking-wider">Inventário de Produtos & Fotos</h3>
               <p class="text-xs text-stone-400">Total: ${this.data.produtos.length} produtos cadastrados com fotos e ilustrações</p>
             </div>
           </div>
@@ -2481,7 +2650,7 @@ class ReVesteApp {
                   <th>Quantidade</th>
                   <th>Tipo</th>
                   <th>Vendedor</th>
-                  <th>Ações de Imagem & Estoque</th>
+                  <th>Alterar Foto & Estoque</th>
                 </tr>
               </thead>
               <tbody>
@@ -2497,7 +2666,7 @@ class ReVesteApp {
                             class="w-12 h-12 rounded-xl object-cover border border-[#E8E2D8] dark:border-[#223F32] group-hover:opacity-75 transition shadow-2xs" 
                             onerror="this.src = app.getFashionPlaceholder('${p.categoria}', '${p.nome}', '${p.cor}', '${p.tipo}'); this.onerror=null;"
                           />
-                          <span class="absolute inset-0 bg-black/40 rounded-xl opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-[10px] font-bold transition">✏️</span>
+                          <span class="absolute inset-0 bg-black/40 rounded-xl opacity-0 group-hover:opacity-100 flex items-center justify-center text-white text-[10px] font-bold transition">️</span>
                         </div>
                         <div>
                           <strong class="text-xs text-[#132E22] dark:text-[#E7EFEA] block hover:text-emerald-800 dark:hover:text-emerald-400 transition cursor-pointer" onclick="app.openChangeImageModal(${p.id})">${p.nome}</strong>
@@ -2528,9 +2697,9 @@ class ReVesteApp {
                           class="px-2.5 py-1 bg-[#FAF7F2] dark:bg-[#142A1F] hover:bg-[#E8DBC9] dark:hover:bg-[#1E3A2B] text-[#065F46] dark:text-[#34D399] border border-[#D5C1A6] dark:border-[#223F32] rounded-lg text-[11px] font-bold flex items-center gap-1 shadow-2xs transition"
                           title="Alterar Imagem desta Peça à vontade"
                         >
-                          🖼️ Imagem
+                          ️ Imagem
                         </button>
-                        <button onclick="app.deleteProduct(${p.id})" class="text-red-500 hover:text-red-700 text-xs p-1" title="Excluir Produto">🗑️</button>
+                        <button onclick="app.deleteProduct(${p.id})" class="text-red-500 hover:text-red-700 text-xs p-1" title="Excluir Produto">️</button>
                       </div>
                     </td>
                   </tr>
@@ -2547,7 +2716,7 @@ class ReVesteApp {
               <p class="text-xs text-[#5E6963] dark:text-[#8EA89C]">Defina permissões entre Cliente, Vendedor Parceiro, Administrador e Equipe de Estoque</p>
             </div>
             <button onclick="app.openNewUserModal()" class="px-3 py-1.5 bg-[#FAF7F2] dark:bg-[#142A1F] hover:bg-[#F4ECE1] text-[#8F6B3D] dark:text-[#CDB087] border border-[#E8DBC9] dark:border-[#223F32] text-xs font-semibold rounded-xl">
-              ➕ Adicionar Usuário
+               Adicionar Usuário
             </button>
           </div>
 
@@ -2577,6 +2746,7 @@ class ReVesteApp {
 
   // --- SPREADSHEET ENGINE ---
   downloadSampleCSVTemplate() {
+    if (this.data.currentUser.perfil !== 'admin') { this.showToast('Somente administradores podem acessar as planilhas.', 'error'); return; }
     let csv = "id,nome,categoria,tamanho,cor,preco,quantidade,tipo,vendedor\n";
     this.data.produtos.forEach(p => {
       csv += `${p.id},"${p.nome}","${p.categoria}","${p.tamanho}","${p.cor}",${p.preco},${p.quantidade},${p.tipo},"${p.vendedor}"\n`;
@@ -2590,15 +2760,30 @@ class ReVesteApp {
   }
 
   handleCSVFileSelected(e) {
+    if (this.data.currentUser.perfil !== 'admin') { this.showToast('Somente administradores podem importar planilhas.', 'error'); return; }
     const file = e.target.files[0];
     if (!file) return;
 
     const reader = new FileReader();
+    const ext = (file.name.split('.').pop() || '').toLowerCase();
     reader.onload = (event) => {
-      const content = event.target.result;
-      this.parseAndSyncStockCSV(content, file.name);
+      try {
+        if (['xlsx','xls','xlsm','ods','fods','numbers'].includes(ext)) {
+          if (!window.XLSX) throw new Error('O leitor de planilhas não carregou. Verifique a conexão e tente novamente.');
+          const workbook = XLSX.read(event.target.result, { type: 'array', cellDates: true });
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          if (!firstSheet) throw new Error('A planilha não possui abas com dados.');
+          const rows = XLSX.utils.sheet_to_json(firstSheet, { header: 1, defval: '' });
+          this.parseAndSyncStockRows(rows, file.name);
+        } else {
+          const text = event.target.result;
+          if (ext === 'tsv') this.parseAndSyncStockRows(text.split(/\r?\n/).filter(Boolean).map(line => line.split('\t')), file.name);
+          else this.parseAndSyncStockCSV(text, file.name);
+        }
+      } catch (err) { this.showToast(`Falha ao importar: ${err.message}`, 'error'); }
     };
-    reader.readAsText(file, 'UTF-8');
+    if (['xlsx','xls','xlsm','ods','fods','numbers'].includes(ext)) reader.readAsArrayBuffer(file);
+    else reader.readAsText(file, 'UTF-8');
   }
 
   loadDefaultTestCSV() {
@@ -2618,29 +2803,42 @@ class ReVesteApp {
   }
 
   parseAndSyncStockCSV(csvText, fileName) {
+    if (this.data.currentUser.perfil !== 'admin') { this.showToast('Somente administradores podem importar planilhas.', 'error'); return; }
     try {
-      const lines = csvText.split(/\r?\n/).filter(l => l.trim().length > 0);
-      if (lines.length < 2) {
-        throw new Error('Arquivo vazio ou sem linhas de dados');
-      }
+      const rows = (window.XLSX ? XLSX.utils.sheet_to_json(XLSX.read(csvText, {type:'string'}).Sheets.Sheet1 || {}, {header:1, defval:''}) : null);
+      // CSV parser fallback handles quoted fields and common delimiters.
+      const delimiter = (csvText.split(/\r?\n/)[0].match(/;/g)||[]).length > (csvText.split(/\r?\n/)[0].match(/,/g)||[]).length ? ';' : ',';
+      const parsed = rows && rows.length ? rows : csvText.split(/\r?\n/).filter(l => l.trim()).map(line => { const out=[]; let cur='', quoted=false; for(let i=0;i<line.length;i++){const ch=line[i]; if(ch==='"' && line[i+1]==='"' && quoted){cur+='"';i++;} else if(ch==='"') quoted=!quoted; else if(ch===delimiter && !quoted){out.push(cur.trim());cur='';} else cur+=ch;} out.push(cur.trim()); return out; });
+      this.parseAndSyncStockRows(parsed, fileName);
+    } catch (err) { this.showToast(`Falha ao ler planilha: ${err.message}`, 'error'); }
+  }
 
+  parseAndSyncStockRows(rows, fileName) {
+    if (this.data.currentUser.perfil !== 'admin') { this.showToast('Somente administradores podem importar planilhas.', 'error'); return; }
+    try {
+      if (!rows || rows.length < 2) throw new Error('Arquivo vazio ou sem linhas de dados');
+      const normalize = v => String(v ?? '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
+      const headers = rows[0].map(normalize);
+      const aliases = { id:['id','codigo','sku','produtoid'], nome:['nome','produto','name','item','descricao'], categoria:['categoria','category','tipopeca'], tamanho:['tamanho','size'], cor:['cor','color'], preco:['preco','price','valor','precovenda'], quantidade:['quantidade','estoque','qtd','stock','quantity'], tipo:['tipo','origem','condicao','type'], vendedor:['vendedor','seller','fornecedor','parceiro'] };
+      const col = key => headers.findIndex(h => aliases[key].includes(h));
+      if (col('nome') < 0) throw new Error('Não encontrei uma coluna de nome/produto. Inclua um cabeçalho como Nome, Produto ou Name.');
+      const val = (row,key, fallback='') => { const i=col(key); return i>=0 ? row[i] : fallback; };
       let updatedCount = 0;
       let addedCount = 0;
-
-      for (let i = 1; i < lines.length; i++) {
-        const row = lines[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || lines[i].split(',');
-        if (row.length < 5) continue;
-
-        const cleanRow = row.map(c => c.trim().replace(/^"|"$/g, ''));
-        const id = parseInt(cleanRow[0]);
-        const nome = cleanRow[1];
-        const categoria = cleanRow[2] || 'Vestuário';
-        const tamanho = cleanRow[3] || 'M';
-        const cor = cleanRow[4] || 'Padrão';
-        const preco = parseFloat(cleanRow[5]) || 99.90;
-        const quantidade = parseInt(cleanRow[6]) || 0;
-        const tipo = cleanRow[7] || 'revenda';
-        const vendedor = cleanRow[8] || 'ReVeste Oficial';
+      for (let i = 1; i < rows.length; i++) {
+        const row = rows[i];
+        if (!row || row.every(v => String(v ?? '').trim() === '')) continue;
+        const id = parseInt(val(row,'id', ''));
+        const nome = String(val(row,'nome','')).trim();
+        if (!nome) continue;
+        const categoria = String(val(row,'categoria','Vestuário') || 'Vestuário').trim();
+        const tamanho = String(val(row,'tamanho','M') || 'M').trim();
+        const cor = String(val(row,'cor','Padrão') || 'Padrão').trim();
+        const rawPrice = String(val(row,'preco','99.90')).replace(/R\$|\s/g,'').replace(/\.(?=\d{3}(?:\D|$))/g,'').replace(',','.');
+        const preco = Number.parseFloat(rawPrice) || 99.90;
+        const quantidade = Math.max(0, parseInt(String(val(row,'quantidade','0')).replace(/[^0-9-]/g,'')) || 0);
+        const tipo = String(val(row,'tipo','revenda') || 'revenda').trim();
+        const vendedor = String(val(row,'vendedor','ReVeste Oficial') || 'ReVeste Oficial').trim();
 
         const existing = this.data.produtos.find(p => p.id === id || p.nome.toLowerCase() === nome.toLowerCase());
         if (existing) {
@@ -2681,7 +2879,7 @@ class ReVesteApp {
 
       this.saveData();
       this.render();
-      this.showToast(`📊 Planilha integrada com sucesso! ${updatedCount} itens com estoque atualizado e ${addedCount} novos adicionados (CT-01 / UC-02).`, 'success');
+      this.showToast(` Planilha integrada com sucesso! ${updatedCount} itens com estoque atualizado e ${addedCount} novos adicionados (CT-01 / UC-02).`, 'success');
     } catch (err) {
       this.showToast(`Falha na leitura da planilha: ${err.message}`, 'error');
     }
@@ -2711,7 +2909,7 @@ class ReVesteApp {
         <div class="bg-white dark:bg-[#102219] rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl border border-[#E8E2D8] dark:border-[#1F382B]">
           <div class="p-4 border-b border-[#E8E2D8] dark:border-[#1F382B] flex items-center justify-between bg-[#FAF7F2] dark:bg-[#142A1F]">
             <h3 class="text-xs font-bold uppercase tracking-wider text-[#132E22] dark:text-[#E7EFEA]">Cadastrar Novo Produto no Estoque</h3>
-            <button onclick="app.closeModal()" class="w-8 h-8 rounded-full bg-stone-200 dark:bg-stone-800 hover:bg-stone-300 text-stone-700 dark:text-stone-300 flex items-center justify-center text-sm font-bold">✕</button>
+            <button onclick="app.closeModal()" class="w-8 h-8 rounded-full bg-stone-200 dark:bg-stone-800 hover:bg-stone-300 text-stone-700 dark:text-stone-300 flex items-center justify-center text-sm font-bold"></button>
           </div>
           <form onsubmit="app.saveNewProduct(event)" class="p-6 space-y-4 text-xs">
             <div>
@@ -2804,13 +3002,14 @@ class ReVesteApp {
   }
 
   openNewUserModal() {
+    if (!this.hasAdminAccess()) { this.showToast('Apenas administradores podem criar contas de equipe.', 'error'); return; }
     const modal = document.getElementById('modal-container');
     modal.innerHTML = `
       <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in" onclick="if(event.target === this) app.closeModal()">
         <div class="bg-white dark:bg-[#102219] rounded-3xl max-w-md w-full overflow-hidden shadow-2xl border border-[#E8E2D8] dark:border-[#1F382B]">
           <div class="p-4 border-b border-[#E8E2D8] dark:border-[#1F382B] flex items-center justify-between bg-[#FAF7F2] dark:bg-[#142A1F]">
             <h3 class="text-xs font-bold uppercase tracking-wider text-[#132E22] dark:text-[#E7EFEA]">Novo Usuário (UC-05)</h3>
-            <button onclick="app.closeModal()" class="w-8 h-8 rounded-full bg-stone-200 dark:bg-stone-800 hover:bg-stone-300 text-stone-700 dark:text-stone-300 flex items-center justify-center text-sm font-bold">✕</button>
+            <button onclick="app.closeModal()" class="w-8 h-8 rounded-full bg-stone-200 dark:bg-stone-800 hover:bg-stone-300 text-stone-700 dark:text-stone-300 flex items-center justify-center text-sm font-bold"></button>
           </div>
           <form onsubmit="app.saveNewUser(event)" class="p-6 space-y-4 text-xs">
             <div>
@@ -2827,7 +3026,7 @@ class ReVesteApp {
                 <option value="cliente">Cliente (Compras e Revenda)</option>
                 <option value="parceiro">Vendedor Parceiro (Vendas e Extrato 80%)</option>
                 <option value="estoque">Equipe de Estoque (Inventário e Planilhas)</option>
-                <option value="admin">Administrador Geral</option>
+                ${this.data.currentUser.perfil === 'admin' ? '<option value="admin">Administrador Geral</option>' : ''}
               </select>
             </div>
             <button type="submit" class="w-full py-3 bg-[#065F46] text-white font-bold rounded-xl hover:bg-[#047857] transition">
@@ -2845,6 +3044,8 @@ class ReVesteApp {
     const nome = document.getElementById('nu-nome').value.trim();
     const email = document.getElementById('nu-email').value.trim();
     const perfil = document.getElementById('nu-perfil').value;
+    if (this.data.perfisDisponiveis.some(u => String(u.email).toLowerCase() === email.toLowerCase())) { this.showToast('Já existe uma conta com este e-mail.', 'error'); return; }
+    if (perfil === 'admin' && this.data.currentUser.perfil !== 'admin') { this.showToast('Somente administradores podem criar outras contas de administrador.', 'error'); return; }
 
     this.data.perfisDisponiveis.push({
       id: this.data.perfisDisponiveis.length + 1,
@@ -2885,7 +3086,7 @@ class ReVesteApp {
             <span class="text-[10px] font-bold uppercase tracking-wider text-[#8F6B3D] dark:text-[#CDB087] block mb-2">Equipe de Desenvolvimento & Autores do Projeto</span>
             <div class="flex flex-wrap gap-2 text-xs font-medium text-[#132E22] dark:text-[#E7EFEA]">
               ${DEVS_TEAM.map(d => `
-                <span onclick="app.setTab('quem-somos')" class="cursor-pointer px-2.5 py-1 bg-white dark:bg-[#102219] rounded-lg border border-[#E8E2D8] dark:border-[#223F32] shadow-2xs hover:border-emerald-600 transition">👤 ${d.nome}</span>
+                <span onclick="app.setTab('quem-somos')" class="cursor-pointer px-2.5 py-1 bg-white dark:bg-[#102219] rounded-lg border border-[#E8E2D8] dark:border-[#223F32] shadow-2xs hover:border-emerald-600 transition"> ${d.nome}</span>
               `).join('')}
             </div>
           </div>
@@ -2914,7 +3115,7 @@ class ReVesteApp {
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E8E2D8] dark:border-[#1F382B]">
             <div>
               <div class="flex items-center gap-2 mb-1">
-                <span class="text-xl">🧪</span>
+                <span class="text-xl"></span>
                 <h3 class="text-base font-bold text-[#132E22] dark:text-[#E7EFEA]">Suíte Interativa de Casos de Teste (CT-01 a CT-08)</h3>
               </div>
               <p class="text-xs text-[#5E6963] dark:text-[#8EA89C]">
@@ -3074,7 +3275,7 @@ class ReVesteApp {
           </div>
           <div class="flex items-center gap-2">
             <span class="text-[10px] bg-[#E8DBC9] dark:bg-[#223F32] text-[#7F5E33] dark:text-[#CDB087] px-2 py-0.5 rounded font-semibold">${rf.prioridade}</span>
-            <span class="text-[10px] bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 px-2 py-0.5 rounded font-bold">✓ ${rf.status}</span>
+            <span class="text-[10px] bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 px-2 py-0.5 rounded font-bold"> ${rf.status}</span>
           </div>
         </div>
         <p class="text-xs text-[#5E6963] dark:text-[#8EA89C]">${rf.desc}</p>
@@ -3100,7 +3301,7 @@ class ReVesteApp {
           <span class="text-[10px] font-semibold text-[#8F6B3D] dark:text-[#CDB087] uppercase">${r.cat}</span>
         </div>
         <strong class="text-xs text-[#132E22] dark:text-[#E7EFEA] block mb-1">${r.req}</strong>
-        <span class="text-[10px] text-emerald-800 dark:text-emerald-400 font-medium block">✓ ${r.status}</span>
+        <span class="text-[10px] text-emerald-800 dark:text-emerald-400 font-medium block"> ${r.status}</span>
       </div>
     `).join('');
   }
@@ -3149,7 +3350,7 @@ class ReVesteApp {
         </div>
 
         <button onclick="app.runAcceptanceTest('${c.id}')" class="w-full py-1.5 bg-[#065F46] hover:bg-[#047857] text-white rounded-xl text-xs font-semibold transition">
-          Testar Agora ⚡
+          Testar Agora 
         </button>
       </div>
     `).join('');
@@ -3246,11 +3447,11 @@ class ReVesteApp {
 
       if (statusEl) {
         if (passed) {
-          statusEl.textContent = '✓ Aprovado';
+          statusEl.textContent = ' Aprovado';
           statusEl.className = 'text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300';
           this.showToast(`[${testId}] APROVADO: ${log}`, 'success');
         } else {
-          statusEl.textContent = '✕ Reprovado';
+          statusEl.textContent = ' Reprovado';
           statusEl.className = 'text-[10px] font-bold px-2 py-0.5 rounded bg-red-100 text-red-800';
           this.showToast(`[${testId}] FALHOU: ${log}`, 'error');
         }
@@ -3283,9 +3484,9 @@ class ReVesteApp {
     toast.className = `toast toast-${type}`;
     
     let icon = 'ℹ️';
-    if (type === 'success') icon = '✅';
-    if (type === 'warning') icon = '⚠️';
-    if (type === 'error') icon = '❌';
+    if (type === 'success') icon = '';
+    if (type === 'warning') icon = '️';
+    if (type === 'error') icon = '';
 
     toast.innerHTML = `
       <span class="text-base">${icon}</span>
