@@ -28,19 +28,19 @@ O projeto foi construído para funcionar de maneira imediata, sem necessidade de
 ### Opção 1: Abertura Direta no Navegador
 Basta dar dois cliques no arquivo:
 ```
-C:\Users\EBB2NL116\reveste-platform\index.html
+./index.html
 ```
 Ou abrir no navegador (Google Chrome, Microsoft Edge, Firefox).
 
 ### Opção 2: Servidor Local via Node.js
 Se preferir rodar em um servidor web HTTP local:
 ```powershell
-cd C:\Users\EBB2NL116\reveste-platform
+cd reveste-professional
 npx serve
 ```
 Ou pelo PowerShell:
 ```powershell
-Start-Process "C:\Users\EBB2NL116\reveste-platform\index.html"
+Start-Process "./index.html"
 ```
 
 ---
@@ -51,7 +51,7 @@ Start-Process "C:\Users\EBB2NL116\reveste-platform\index.html"
 |---|---|---|
 | **RF-01** | Manter produtos | Catálogo interativo com filtros por categoria, condição, cores, tamanhos e gestão no painel admin. |
 | **RF-02** | Gerenciar estoque | Baixa automática do estoque após cada compra; alerta visual de estoque crítico. |
-| **RF-03** | Integrar planilha de estoque | Módulo no painel administrativo para importar planilhas CSV (`sample-estoque.csv`), validar e sincronizar. |
+| **RF-03** | Integrar planilha de estoque | Módulo no painel administrativo para importar planilhas CSV (`sample-estoque.xlsx`), validar e sincronizar. |
 | **RF-04** | Manter usuários | Cadastro de contas com atribuição de perfis (Cliente, Parceiro, Admin, Estoque). |
 | **RF-05** | Registrar pedidos | Fluxo de checkout com itens, quantidades, endereço, frete e dados do comprador. |
 | **RF-06** | Acompanhar entrega | Aba "Rastreamento" com busca por código (`BR938210492BR`, `DHL74829104EU`) e timeline. |
@@ -73,17 +73,11 @@ Start-Process "C:\Users\EBB2NL116\reveste-platform\index.html"
 
 ---
 
-## 🧪 Casos de Teste de Aceite Interativos (CT-01 a CT-08)
+## 🧪 Testes de aceite
 
-Na aba **Central DRS**, você pode clicar em **"Executar Todos os Testes"** para validar em tempo real:
-- **CT-01:** Sincronização e atualização de estoque via planilha.
-- **CT-02:** Bloqueio de compra ao tentar solicitar quantidade acima do estoque.
-- **CT-03:** Divisão transparente de valores com base configurada.
-- **CT-04:** Validação matemática dos 20% de comissão e 80% de repasse.
-- **CT-05:** Disponibilidade de rastreamento com código e eventos físicos.
-- **CT-06:** Exigência de 2FA no fluxo de compra.
-- **CT-07:** Responsividade em celulares e telas pequenas.
-- **CT-08:** Bloqueio de acesso administrativo para perfis de cliente (RBAC).
+Os testes de aceite e a especificação técnica continuam pertencendo ao material interno de desenvolvimento; eles não são exibidos como páginas da navegação pública do marketplace.
+
+---
 
 ---
 
@@ -110,7 +104,7 @@ reveste-platform/
 ├── index.html              # Interface principal completa e responsiva
 ├── styles.css              # Sistema de design, paleta de cores e animações
 ├── app.js                  # Lógica interativa, dados, regras de negócio e testes
-├── sample-estoque.csv      # Planilha CSV pronta para teste de importação de estoque
+├── sample-estoque.xlsx      # Planilha CSV pronta para teste de importação de estoque
 └── README.md               # Esta documentação
 ```
 
@@ -127,4 +121,25 @@ O site da ReVeste foi desenvolvido pela **Develup**. A Develup é a equipe respo
 
 - Adicionado o formulário **Criar conta** para cadastrar perfis de cliente de demonstração. Os perfis são salvos no `localStorage` deste navegador; este formulário não é autenticação de produção e não armazena a senha.
 - Substituído o retrato usado como logotipo por um símbolo SVG próprio da ReVeste, inspirado em cabide e moda circular.
-- O retrato original foi reaproveitado na seção **Quem Somos — Develup** como imagem editorial.
+- A página pública não exibe mais a seção de apresentação da equipe de desenvolvimento.
+
+
+## Melhorias de experiência — edição profissional
+
+- Alerta de preço fora da faixa: o sistema compara o preço sugerido com a mediana dos produtos ativos da mesma categoria (limite de alerta: maior entre R$ 500 e 2,5× a mediana).
+- O alerta explica que preços muito altos podem reduzir a procura e oferece duas escolhas: revisar o valor ou publicar mesmo assim.
+- A calculadora de repasse 80/20 e a orientação de preço atualizam-se ao mudar o valor ou a categoria.
+- Foram refinados estados de foco, microinterações, animações de entrada e hover, responsividade do alerta e suporte a `prefers-reduced-motion`.
+
+**Observação:** a referência de preço é uma heurística local baseada no catálogo de demonstração, não uma avaliação de mercado nem garantia de venda. O protótipo mantém dados no navegador e não substitui autenticação, pagamentos ou armazenamento de produção no servidor.
+
+
+## Planilha de estoque profissional
+
+O arquivo `sample-estoque.xlsx` substitui a planilha de demonstração simples e inclui:
+- Aba **Estoque** com tabela formatada, filtros, cabeçalhos fixos, validação de dados e sinalização de estoque baixo.
+- Aba **Resumo** com indicadores automáticos de produtos, unidades e valor total em estoque.
+- Aba **Como usar** com instruções para edição e importação.
+- Colunas de ID e SKU, categoria, tamanho, cor, preço, quantidade, estoque mínimo, status, tipo de venda, vendedor e valor total por item.
+
+No painel administrativo, importe o arquivo `.xlsx`; a plataforma já aceita planilhas Excel por meio do leitor XLSX incluído no site.

@@ -87,13 +87,10 @@
     <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-1 text-center sm:text-left">
       <div class="flex items-center gap-2">
         <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span>ReVeste — Moda Circular & Marketplace • <strong>DRS v1.0 (Outubro/2026)</strong></span>
+        <span>ReVeste — Moda circular, escolhas conscientes.</span>
       </div>
       <div class="flex items-center gap-4 text-tan-300">
-        <span class="hidden md:inline">Engenharia de Software & Moda</span>
-        <button onclick="app.setTab('quem-somos')" class="text-tan-400 hover:text-tan-200 font-semibold underline text-[11px]">
-          Conheça a Develup
-        </button>
+        <span class="hidden md:inline">Peças com história. Um novo jeito de vestir.</span>
       </div>
     </div>
   </div>
@@ -122,12 +119,6 @@
             </button>
             <button onclick="app.setTab('rastreio')" data-tab="rastreio" class="nav-tab" aria-label="Rastreamento">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h11v11H3z"/><path d="M14 11h4l3 3v4h-7z"/><circle cx="7.5" cy="19" r="1.7"/><circle cx="17.5" cy="19" r="1.7"/></svg><span>Rastreamento</span>
-            </button>
-            <button onclick="app.setTab('drs')" data-tab="drs" class="nav-tab" aria-label="Central DRS">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/></svg><span>Central DRS</span>
-            </button>
-            <button onclick="app.setTab('quem-somos')" data-tab="quem-somos" class="nav-tab" aria-label="Quem Somos">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20v-1.4A5.6 5.6 0 0 1 8.1 13h1.8a5.6 5.6 0 0 1 5.6 5.6V20M16 4.8a3.5 3.5 0 0 1 0 6.5M18 13.5a5.3 5.3 0 0 1 3.5 5V20"/></svg><span>Quem Somos</span>
             </button>
           </nav>
 
@@ -204,7 +195,6 @@
             <li><a href="javascript:void(0)" onclick="app.setTab('rastreio')" class="hover:text-emerald-300 transition"> Rastreamento (RF-06 / RF-09)</a></li>
             <li><a href="javascript:void(0)" onclick="app.setTab('parceiro')" class="hover:text-emerald-300 transition"> Painel Parceiro 80/20 (RF-07)</a></li>
             <li><a href="javascript:void(0)" onclick="app.setTab('admin')" class="hover:text-emerald-300 transition">️ Planilha de Estoque (RF-03)</a></li>
-            <li><a href="javascript:void(0)" onclick="app.setTab('quem-somos')" class="hover:text-emerald-300 transition font-bold text-emerald-400"> Conheça os Devs_</a></li>
           </ul>
         </div>
 
@@ -214,11 +204,8 @@
             <button onclick="app.toggleLofiMusic()" class="w-full py-2 px-3 bg-emerald-900/80 hover:bg-emerald-800 text-emerald-200 rounded-xl text-[11px] font-semibold border border-emerald-600/50 flex items-center justify-center gap-1.5 transition">
                Tocar Música Lo-Fi de Loja
             </button>
-            <button onclick="app.setTab('drs'); setTimeout(() => app.runAllAcceptanceTests(), 300);" class="w-full py-2 px-3 bg-[#183629] hover:bg-[#204938] text-tan-200 rounded-xl text-[11px] font-semibold border border-emerald-900/50 flex items-center justify-center gap-1.5 transition">
-               Rodar Casos de Teste (CT-01 a 08)
-            </button>
             <button onclick="app.resetData()" class="w-full py-2 px-3 bg-stone-900 hover:bg-stone-800 text-stone-400 rounded-xl text-[11px] font-medium flex items-center justify-center gap-1.5 transition">
-               Restaurar Dados Padrão do DRS
+               Restaurar dados de demonstração
             </button>
           </div>
         </div>
@@ -226,8 +213,8 @@
       </div>
 
       <div class="flex flex-col sm:flex-row items-center justify-between text-[11px] text-[#7A9184] gap-2">
-        <p>© 2026 ReVeste — Todos os direitos reservados. DRS Versão 1.0 (Outubro/2026).</p>
-        <p>Desenvolvido para conformidade integral com a especificação de software.</p>
+        <p>© 2026 ReVeste — Todos os direitos reservados.</p>
+        <p>Moda circular para dar novas histórias às suas peças.</p>
       </div>
     </div>
   </footer>

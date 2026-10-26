@@ -737,6 +737,13 @@ class ReVesteApp {
 
   // --- NAVIGATION ---
   setTab(tab) {
+    // Internal engineering/about pages are intentionally not part of the storefront.
+    if (tab === 'drs' || tab === 'quem-somos') {
+      this.currentTab = 'loja';
+      this.renderHeader();
+      this.render();
+      return;
+    }
     if (tab === 'admin' && !this.hasAdminAccess()) {
       this.showToast('Acesso Restrito: Apenas Administrador e Equipe de Estoque podem acessar este painel (RN-05, CT-08).', 'error');
       return;
@@ -822,12 +829,6 @@ class ReVesteApp {
         break;
       case 'admin':
         this.renderAdmin(main);
-        break;
-      case 'drs':
-        this.renderDRS(main);
-        break;
-      case 'quem-somos':
-        this.renderQuemSomos(main);
         break;
       default:
         this.renderLoja(main);
@@ -1929,7 +1930,7 @@ class ReVesteApp {
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                   <label class="block text-xs font-semibold text-[#132E22] dark:text-[#E7EFEA] mb-1">Categoria *</label>
-                  <select id="res-categoria" class="w-full text-xs bg-[#FAF7F2] dark:bg-[#142A1F] border border-[#E8E2D8] dark:border-[#223F32] text-[#1A2821] dark:text-[#E7EFEA] rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-emerald-700 focus:outline-none font-medium">
+                  <select id="res-categoria" onchange="app.updateResaleCalculator(document.getElementById('res-preco')?.value)" class="w-full text-xs bg-[#FAF7F2] dark:bg-[#142A1F] border border-[#E8E2D8] dark:border-[#223F32] text-[#1A2821] dark:text-[#E7EFEA] rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-emerald-700 focus:outline-none font-medium">
                     <option value="Casacos">Casacos / Jaquetas</option>
                     <option value="Vestidos">Vestidos</option>
                     <option value="Camisas">Camisas</option>
@@ -1979,6 +1980,7 @@ class ReVesteApp {
                     class="w-full text-sm font-bold bg-white dark:bg-[#102219] border border-[#E8DBC9] dark:border-[#223F32] text-[#132E22] dark:text-[#E7EFEA] rounded-xl pl-9 pr-3 py-2 focus:ring-2 focus:ring-emerald-700 focus:outline-none" 
                   />
                 </div>
+                <p id="res-price-guidance" class="res-price-guidance" aria-live="polite">Dica de preço: você pode ajustar o valor a qualquer momento antes de publicar.</p>
 
                 <div class="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-[#E8DBC9] dark:border-[#223F32]">
                   <div class="bg-white dark:bg-[#102219] p-2.5 rounded-xl border border-[#E8DBC9] dark:border-[#223F32]">
@@ -2064,18 +2066,43 @@ class ReVesteApp {
         </div>
       </div>
     `;
+    this.updateResaleCalculator(document.getElementById('res-preco')?.value || '200');
+  }
+
+  getResalePriceBenchmark(categoria) {
+    // Use comparable items already in the catalogue as a lightweight reference.
+    const values = (this.data.produtos || [])
+      .filter(p => p.ativo !== false && p.categoria === categoria && Number(p.preco) > 0)
+      .map(p => Number(p.preco))
+      .sort((a, b) => a - b);
+    if (!values.length) return 500;
+    const middle = Math.floor(values.length / 2);
+    const median = values.length % 2 ? values[middle] : (values[middle - 1] + values[middle]) / 2;
+    return Math.max(500, median * 2.5);
   }
 
   updateResaleCalculator(val) {
     const num = parseFloat(val) || 0;
     const repasse = (num * 0.80).toFixed(2).replace('.', ',');
     const comissao = (num * 0.20).toFixed(2).replace('.', ',');
-
     const elRepasse = document.getElementById('sim-repasse');
     const elComissao = document.getElementById('sim-comissao');
-
     if (elRepasse) elRepasse.textContent = `R$ ${repasse}`;
     if (elComissao) elComissao.textContent = `R$ ${comissao}`;
+
+    const category = document.getElementById('res-categoria')?.value || 'Casacos';
+    const threshold = this.getResalePriceBenchmark(category);
+    const hint = document.getElementById('res-price-guidance');
+    if (hint) {
+      const money = n => n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+      if (num > threshold) {
+        hint.className = 'res-price-guidance res-price-guidance-warning';
+        hint.innerHTML = `<strong>Preço acima do padrão do catálogo.</strong> Peças semelhantes costumam ter preços menores. Considere revisar o valor — ou mantenha-o se houver um motivo especial. Referência de alerta: ${money(threshold)}.`;
+      } else {
+        hint.className = 'res-price-guidance';
+        hint.textContent = `Dica de preço: valores acima de ${money(threshold)} podem ter menos procura. Você continua livre para definir seu preço.`;
+      }
+    }
   }
 
   handleResaleImageUpload(e) {
@@ -2133,7 +2160,7 @@ class ReVesteApp {
     reader.readAsDataURL(file);
   }
 
-  submitResale(e) {
+  submitResale(e, confirmHighPrice = false) {
     e.preventDefault();
     const nome = document.getElementById('res-nome').value.trim();
     const categoria = document.getElementById('res-categoria').value;
@@ -2146,6 +2173,29 @@ class ReVesteApp {
     if (!imagem) {
       this.showToast('Envie uma foto da peça antes de cadastrar o anúncio.', 'error');
       document.getElementById('res-imagem-arquivo')?.focus();
+      return;
+    }
+
+    const threshold = this.getResalePriceBenchmark(categoria);
+    if (!confirmHighPrice && preco > threshold) {
+      const modal = document.getElementById('modal-container');
+      const money = n => n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+      modal.innerHTML = `
+        <div class="rv-modal-backdrop animate-fade-in" role="presentation" onclick="if(event.target === this) app.closeModal()">
+          <section class="rv-price-warning-modal" role="alertdialog" aria-modal="true" aria-labelledby="rv-price-warning-title" aria-describedby="rv-price-warning-copy">
+            <div class="rv-warning-icon" aria-hidden="true">!</div>
+            <p class="rv-modal-eyebrow">Dica para vender melhor</p>
+            <h2 id="rv-price-warning-title">Esse preço pode afastar compradores</h2>
+            <p id="rv-price-warning-copy">Você definiu <strong>${money(preco)}</strong>. Esse valor está bem acima da referência de <strong>${money(threshold)}</strong> para peças semelhantes no catálogo. Compradores podem preferir anúncios mais baratos.</p>
+            <p class="rv-warning-note">Você continua no controle: pode ajustar o preço ou publicar mesmo assim.</p>
+            <div class="rv-warning-actions">
+              <button type="button" class="rv-button-secondary" onclick="app.closeModal(); document.getElementById('res-preco')?.focus()">Revisar preço</button>
+              <button type="button" class="rv-button-primary" onclick="app.submitResale({preventDefault:()=>{}}, true)">Publicar mesmo assim</button>
+            </div>
+          </section>
+        </div>`;
+      modal.classList.remove('hidden');
+      modal.querySelector('.rv-button-secondary')?.focus();
       return;
     }
 
@@ -2185,6 +2235,7 @@ class ReVesteApp {
     };
     this.data.produtos.unshift(newProd);
 
+    this.closeModal();
     this.saveData();
     this.showToast(` Solicitação ${newSubId} cadastrada e aprovada com sucesso! Produto agora está visível no catálogo.`, 'success');
     this.render();
